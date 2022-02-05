@@ -19,9 +19,11 @@ public class DbConnection {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection("jdbc:postgresql://" + dbHost + ":" + dbPort + "/" + dbName,
                     dbUser, dbPass);
-            System.out.println("connected To DB");
+            System.out.println("connected To DB...");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }
