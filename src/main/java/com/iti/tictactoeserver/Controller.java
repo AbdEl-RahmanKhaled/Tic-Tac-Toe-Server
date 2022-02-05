@@ -1,14 +1,20 @@
 package com.iti.tictactoeserver;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import com.iti.tictactoeserver.helpers.server.ClientListener;
 
 public class Controller {
-    @FXML
-    private Label welcomeText;
+    private static final ClientListener clientListener = new ClientListener();
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+    protected void onActionStart() {
+        clientListener.setDaemon(true);
+        clientListener.start();
     }
+
+    @FXML
+    protected void onActionStop() {
+        clientListener.interrupt();
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.iti.tictactoeserver.helpers;
+package com.iti.tictactoeserver.helpers.db;
 
 import java.sql.*;
 
