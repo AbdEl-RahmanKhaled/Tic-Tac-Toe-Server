@@ -1,7 +1,9 @@
 package com.iti.tictactoeserver.helpers.db;
+
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.models.Position;
+import com.iti.tictactoeserver.models.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -104,8 +106,33 @@ public class DbConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return players;
     }
+
+
+    public boolean authenticate(User usr) throws SQLException {
+        Statement stmt = connection.createStatement();
+        String queryString = new String("select * from users where username='" + usr.getUser_name() + "' && password='" + usr.getPassword() + "';");
+        ResultSet rs = stmt.executeQuery(queryString);
+        if (rs.first())
+            return true;
+        return false;
+    }
+
+    public List<Match> getMatchHistory() throws SQLException {
+        List<Match> matches = new ArrayList<Match>();
+        Statement stmt = connection.createStatement();
+        String queryString = new String("select * from matches;");
+        ResultSet rs = stmt.executeQuery(queryString);
+        if (!rs.next()) {
+            return null;
+        }
+        do {
+            Match match = new Match();
+            matches.add(match);
+        } while (rs.next());
+        return matches;
+    }
+
 
 }
