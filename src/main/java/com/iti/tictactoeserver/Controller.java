@@ -8,13 +8,13 @@ public class Controller {
 
     @FXML
     protected void onActionStart() {
-        clientListener.setDaemon(true);
-        clientListener.start();
+        //clientListener.setDaemon(true);
+        //clientListener.start();
     }
 
     @FXML
     protected void onActionStop() {
-        clientListener.interrupt();
+        //clientListener.interrupt();
     }
 
 }
