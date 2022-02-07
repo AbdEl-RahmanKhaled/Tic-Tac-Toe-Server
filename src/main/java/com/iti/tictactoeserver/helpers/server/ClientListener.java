@@ -8,6 +8,7 @@ public class ClientListener extends Thread {
 
     @Override
     public void run() {
+        ClientHandler.initPlayerList();
         try {
             ServerSocket serverSocket = new ServerSocket(5000);
 

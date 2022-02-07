@@ -1,7 +1,5 @@
 package com.iti.tictactoeserver.helpers.db;
-
 import com.iti.tictactoeserver.models.Match;
-import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.models.Position;
 
