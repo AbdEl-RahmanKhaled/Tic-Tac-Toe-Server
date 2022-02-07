@@ -17,7 +17,6 @@ public class ClientHandler extends Thread {
     private Socket clientSocket;
     private int id;
     public ClientHandler(Socket socket) {
-        id = 10;
         try {
             dataInputStream = new DataInputStream(socket.getInputStream());
             printStream = new PrintStream(socket.getOutputStream());
