@@ -1,9 +1,12 @@
 package com.iti.tictactoeserver.helpers.db;
 
 import com.iti.tictactoeserver.models.Match;
+import com.iti.tictactoeserver.models.Position;
 import com.iti.tictactoeserver.models.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbConnection {
     private static final String dbName = "xo_db";
@@ -12,8 +15,6 @@ public class DbConnection {
     private static final String dbUser = "postgres";
     private static final String dbPass = "admin";
     private Connection connection;
-    ResultSet rsuser;
-    ResultSet rsmatch;
 
     public DbConnection() {
         connect();
@@ -30,46 +31,52 @@ public class DbConnection {
         }
     }
 
-    public boolean signUp() {
-        if (ValidateUserName()) {
+    public boolean signUp(User user) {
+        if (ValidateUserName(user.getUserName())) {
             return false;
         } else {
-            User user = new User();
             PreparedStatement pst = null;
             try {
-                pst = connection.prepareStatement("insert into users (name , username , password , points) values (? , ? , ? , ?)");
-                pst.setString(2, user.getName());
-                pst.setString(3, user.getUserName());
-                pst.setString(4, user.getPassword());
-                pst.setInt(5, user.getPoints());
-                rsuser = pst.executeQuery();
+                pst = connection.prepareStatement("insert into users (name , username , password ) values (? , ? , ?)");
+                pst.setString(1, user.getName());
+                pst.setString(2, user.getUserName());
+                pst.setString(3, user.getPassword());
+                //pst.setInt(4, user.getPoints());
+                pst.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
             return true;
         }
     }
-    public boolean ValidateUserName() {
-        return rsuser.next();
+
+    public boolean ValidateUserName(String user_name) {
+        PreparedStatement p = null;
+        try {
+            p = connection.prepareStatement("select * from user where userName = ?");
+            p.setString(1, user_name);
+            ResultSet result = p.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
-    public void getPositions() {
-        if(ValidateMatch()) {
-            Match match = new Match();
-            PreparedStatement pst = null;
-            try {
-                pst = connection.prepareStatement("select position from positions where m_id = ?");
-                pst.setInt(1, match.getM_id());
-                rsmatch = pst.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
+    public List<Position> getPositions(Match match) {
+        List<Position> positions = new ArrayList<>();
+        try {
+            PreparedStatement pst = connection.prepareStatement("select position from positions where m_id = ?");
+            pst.setInt(1, match.getM_id());
+            ResultSet rsmatch = pst.executeQuery();
+            while (rsmatch.next()) {
+                positions.add(new Position(rsmatch.getInt("m_id"),
+                        rsmatch.getInt("player_id"),
+                        rsmatch.getString("position")));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        else{
-            System.out.println("Match does not exist!");
-        }
-    }
-    public boolean ValidateMatch(){
-        return rsmatch.next();
+        return positions;
     }
 }
