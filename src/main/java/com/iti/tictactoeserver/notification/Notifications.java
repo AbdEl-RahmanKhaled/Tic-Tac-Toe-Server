@@ -1,7 +1,10 @@
 package com.iti.tictactoeserver.notification;
 
 public class Notifications {
-    private String type;
+    protected String type;
+
+    public static final String NOTIFICATION_GAME_INVITATION = "gameInvitationNotification";
+    public static final String NOTIFICATION_UPDATE_STATUS = "updateStatusNotification";
 
 
     public Notifications() {

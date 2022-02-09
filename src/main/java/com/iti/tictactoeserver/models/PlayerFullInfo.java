@@ -6,13 +6,15 @@ public class PlayerFullInfo extends Player{
     private boolean inGame;
 
     public PlayerFullInfo(){
-
+        s_id = -1;
     }
 
-    public PlayerFullInfo(int db_id, String name, int points) {
+    public PlayerFullInfo(int index, int db_id, String name, int points) {
+        this.index = index;
         this.db_id = db_id;
         this.name = name;
         this.points = points;
+        s_id = -1;
         status = OFFLINE;
         inGame = false;
     }

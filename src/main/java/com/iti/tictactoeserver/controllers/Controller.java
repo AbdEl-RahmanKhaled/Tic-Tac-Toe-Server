@@ -1,4 +1,4 @@
-package com.iti.tictactoeserver;
+package com.iti.tictactoeserver.controllers;
 
 import javafx.fxml.FXML;
 import com.iti.tictactoeserver.helpers.server.ClientListener;

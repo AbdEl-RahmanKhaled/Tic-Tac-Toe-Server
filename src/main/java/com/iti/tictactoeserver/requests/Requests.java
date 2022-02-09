@@ -1,7 +1,9 @@
 package com.iti.tictactoeserver.requests;
 
 public class Requests {
-    private String action;
+    protected String action;
+
+    public static final String ACTION_INVITE_TO_GAME = "inviteToGame";
 
     public String getAction() {
         return action;

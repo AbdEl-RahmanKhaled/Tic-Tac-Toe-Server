@@ -4,12 +4,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="437.0" prefWidth="527.0" spacing="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.iti.tictactoeserver.Controller">
+<VBox alignment="CENTER" prefHeight="437.0" prefWidth="527.0" spacing="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.iti.tictactoeserver.controllers.Controller">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
    <children>
-      <ListView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+      <ListView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets></ListView>
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER" prefHeight="100.0">
          <children>

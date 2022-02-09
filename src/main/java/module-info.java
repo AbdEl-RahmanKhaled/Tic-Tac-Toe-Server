@@ -11,5 +11,7 @@ module com.iti.tictactoeserver {
 
     opens com.iti.tictactoeserver to javafx.fxml;
     exports com.iti.tictactoeserver;
+    exports com.iti.tictactoeserver.controllers;
+    opens com.iti.tictactoeserver.controllers to javafx.fxml;
 
 }

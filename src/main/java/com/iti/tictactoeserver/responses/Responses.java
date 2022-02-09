@@ -4,7 +4,7 @@ public class Responses {
     public static final String ERROR = "error";
     public static final String OK = "ok";
 
-    private String message, status, type;
+    protected String message, status, type;
 
     public String getMessage() {
         return message;

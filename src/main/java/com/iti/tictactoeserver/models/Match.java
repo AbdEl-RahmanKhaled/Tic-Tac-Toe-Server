@@ -1,10 +1,13 @@
 package com.iti.tictactoeserver.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Timestamp;
 
 public class Match {
     private int m_id, player1_id, player2_id, winner;
     private String p1_choice, p2_choice, status, level;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private Timestamp m_date;
     public static final char CHOICE_X = 'X';
     public static final char CHOICE_O = 'O';

@@ -96,12 +96,15 @@ public class DbConnection {
         try {
             PreparedStatement stm = connection.prepareStatement("select u_id, name, points from users ");
             ResultSet resultSet = stm.executeQuery();
+            int index = 0;
             while (resultSet.next()) {
                 players.add(new PlayerFullInfo(
+                        index,
                         resultSet.getInt("u_id"),
                         resultSet.getString("name"),
                         resultSet.getInt("points")
                 ));
+                index++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
