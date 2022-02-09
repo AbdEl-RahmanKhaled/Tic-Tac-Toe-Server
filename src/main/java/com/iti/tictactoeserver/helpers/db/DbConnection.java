@@ -1,4 +1,5 @@
 package com.iti.tictactoeserver.helpers.db;
+
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.models.Position;
@@ -62,6 +63,7 @@ public class DbConnection {
         }
         return false;
     }
+
     public void saveMatch(Match match, List<Position> positions) {
         // insert match into the database
         try {
@@ -145,7 +147,7 @@ public class DbConnection {
 
     public boolean authenticate(User usr) throws SQLException {
         Statement stmt = connection.createStatement();
-        String queryString = new String("select * from users where username='" + usr.getUser_name() + "' && password='" + usr.getPassword() + "';");
+        String queryString = new String("select * from users where username='" + usr.getUserName() + "' && password='" + usr.getPassword() + "';");
         ResultSet rs = stmt.executeQuery(queryString);
         if (rs.first())
             return true;
@@ -168,6 +170,7 @@ public class DbConnection {
         }
         return positions;
     }
+
     public List<Match> getMatchHistory() throws SQLException {
         List<Match> matches = new ArrayList<Match>();
         Statement stmt = connection.createStatement();

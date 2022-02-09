@@ -36,7 +36,7 @@ public class User {
         return name;
     }
 
-    public String getUser_name() {
+    public String getUserName() {
         return username;
     }
 
