@@ -1,5 +1,4 @@
 package com.iti.tictactoeserver.helpers.db;
-
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.models.Position;
@@ -32,6 +31,37 @@ public class DbConnection {
         }
     }
 
+    public boolean signUp(User user) {
+        if (ValidateUserName(user.getUserName())) {
+            return false;
+        } else {
+            PreparedStatement pst = null;
+            try {
+                pst = connection.prepareStatement("insert into users (name , username , password ) values (? , ? , ?)");
+                pst.setString(1, user.getName());
+                pst.setString(2, user.getUserName());
+                pst.setString(3, user.getPassword());
+                //pst.setInt(4, user.getPoints());
+                pst.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+    }
+
+    public boolean ValidateUserName(String user_name) {
+        PreparedStatement p = null;
+        try {
+            p = connection.prepareStatement("select * from user where userName = ?");
+            p.setString(1, user_name);
+            ResultSet result = p.executeQuery();
+            return result.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
     public void saveMatch(Match match, List<Position> positions) {
         // insert match into the database
         try {
@@ -122,6 +152,22 @@ public class DbConnection {
         return false;
     }
 
+    public List<Position> getPositions(Match match) {
+        List<Position> positions = new ArrayList<>();
+        try {
+            PreparedStatement pst = connection.prepareStatement("select position from positions where m_id = ?");
+            pst.setInt(1, match.getM_id());
+            ResultSet rsmatch = pst.executeQuery();
+            while (rsmatch.next()) {
+                positions.add(new Position(rsmatch.getInt("m_id"),
+                        rsmatch.getInt("player_id"),
+                        rsmatch.getString("position")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return positions;
+    }
     public List<Match> getMatchHistory() throws SQLException {
         List<Match> matches = new ArrayList<Match>();
         Statement stmt = connection.createStatement();
