@@ -5,6 +5,7 @@ public class Notifications {
 
     public static final String NOTIFICATION_GAME_INVITATION = "gameInvitationNotification";
     public static final String NOTIFICATION_UPDATE_STATUS = "updateStatusNotification";
+    public static final String NOTIFICATION_START_GAME = "startGameNotification";
 
 
     public Notifications() {

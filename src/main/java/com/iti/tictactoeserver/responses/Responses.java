@@ -1,8 +1,12 @@
 package com.iti.tictactoeserver.responses;
 
 public class Responses {
-    public static final String ERROR = "error";
-    public static final String OK = "ok";
+    public static final String STATUS_ERROR = "error";
+    public static final String STATUS_OK = "ok";
+//    public static final String STATUS_ACCEPTED = "accepted";
+//    public static final String STATUS_REJECTED = "rejected";
+
+    public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
 
     protected String message, status, type;
 
