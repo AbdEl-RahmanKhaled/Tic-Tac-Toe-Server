@@ -1,6 +1,6 @@
 package com.iti.tictactoeserver.responses;
 
-public class Responses {
+public class Response {
     public static final String STATUS_ERROR = "error";
     public static final String STATUS_OK = "ok";
 //    public static final String STATUS_ACCEPTED = "accepted";
@@ -9,6 +9,20 @@ public class Responses {
     public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
 
     protected String message, status, type;
+
+    public Response() {
+    }
+
+    public Response(String status, String type) {
+        this.status = status;
+        this.type = type;
+    }
+
+    public Response(String message, String status, String type) {
+        this.message = message;
+        this.status = status;
+        this.type = type;
+    }
 
     public String getMessage() {
         return message;

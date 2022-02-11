@@ -7,7 +7,9 @@ import com.iti.tictactoeserver.models.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DbConnection {
     private static final String dbName = "xo_db";
@@ -144,6 +146,25 @@ public class DbConnection {
         return players;
     }
 
+
+    public Map<Integer, PlayerFullInfo> getAllPlayers(boolean b) {
+        Map<Integer, PlayerFullInfo> players = new HashMap<>();
+        try {
+            PreparedStatement stm = connection.prepareStatement("select u_id, name, points from users ");
+            ResultSet resultSet = stm.executeQuery();
+            while (resultSet.next()) {
+                int db_id = resultSet.getInt("u_id");
+                players.put(db_id,
+                        new PlayerFullInfo(db_id,
+                                resultSet.getString("name"),
+                                resultSet.getInt("points")
+                        ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return players;
+    }
 
     public boolean authenticate(User usr) throws SQLException {
         Statement stmt = connection.createStatement();

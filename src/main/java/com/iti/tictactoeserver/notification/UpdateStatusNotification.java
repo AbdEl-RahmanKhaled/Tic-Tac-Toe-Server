@@ -3,7 +3,7 @@ package com.iti.tictactoeserver.notification;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 
-public class UpdateStatusNotification extends Notifications {
+public class UpdateStatusNotification extends Notification {
     PlayerFullInfo playerFullInfo;
 
     public UpdateStatusNotification() {

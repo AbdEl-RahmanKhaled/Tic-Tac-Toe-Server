@@ -11,33 +11,31 @@ import com.iti.tictactoeserver.responses.*;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ClientHandler extends Thread {
 
-    private static List<ClientHandler> clients = new ArrayList<>();
+    //    private static List<ClientHandler> clients = new ArrayList<>();
     private static final DbConnection dbConnection = new DbConnection();
-    private Map<String, IAction> actions = new HashMap<>();
-    private static List<PlayerFullInfo> playersFullInfo;
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static Map<Long, ClientHandler> clients = new HashMap<>();
+    private static Map<Integer, PlayerFullInfo> playersFullInfo;
+    private Map<String, IAction> actions;
     private PrintStream printStream;
-    private DataInputStream dataInputStream;
-    private static ObjectMapper mapper = new ObjectMapper();
+    private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
-//    private static Gson gson = new Gson();
 
     public ClientHandler(Socket socket) {
         initActions();
         try {
-            dataInputStream = new DataInputStream(socket.getInputStream());
+            dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printStream = new PrintStream(socket.getOutputStream());
-            clients.add(this);
+            clients.put(this.getId(), this);
+//            clients.add(this);
             System.out.println("No. Clients: " + clients.size());
             start();
         } catch (IOException e) {
@@ -46,10 +44,12 @@ public class ClientHandler extends Thread {
     }
 
     private void initActions() {
-        actions.put(Requests.ACTION_LOGIN, this::login);
-        actions.put(Requests.ACTION_INVITE_TO_GAME, this::inviteToGame);
-        actions.put(Requests.ACTION_ACCEPT_INVITATION, this::acceptInvitation);
-        actions.put(Requests.ACTION_REJECT_INVITATION, this::rejectInvitation);
+        actions = new HashMap<>();
+        actions.put(Request.ACTION_INVITE_TO_GAME, this::inviteToGame);
+        actions.put(Request.ACTION_ACCEPT_INVITATION, this::acceptInvitation);
+        actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
+        actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
+        actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
     }
 
 
@@ -63,10 +63,7 @@ public class ClientHandler extends Thread {
                 actions.get(clientAction).handleAction(jRequest);
             } catch (Exception e) {
                 System.out.println("Stopped");
-                myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
-                myFullInfoPlayer.setS_id(-1);
-                updateStatus(myFullInfoPlayer);
-                clients.remove(this);
+                dropConnection();
                 System.out.println("No. of Clients: " + clients.size());
                 break;
             }
@@ -75,14 +72,9 @@ public class ClientHandler extends Thread {
 
 
     public static void initPlayerList() {
-        playersFullInfo = new ArrayList<>();
-        playersFullInfo = dbConnection.getAllPlayers();
+        playersFullInfo = new HashMap<>();
+        playersFullInfo = dbConnection.getAllPlayers(true);
         System.out.println(playersFullInfo.size());
-    }
-
-    private void login(String json) {
-
-
     }
 
     private void inviteToGame(String json) {
@@ -90,20 +82,20 @@ public class ClientHandler extends Thread {
             // convert json to java object
             InviteToGameReq inviteToGameReq = mapper.readValue(json, InviteToGameReq.class);
             // get the competitor and send the notification
-            ClientHandler competitor = getCompetitor(inviteToGameReq.getPlayer());
+//            ClientHandler competitor = getCompetitor(inviteToGameReq.getPlayer());
+            ClientHandler _competitor = clients.get(inviteToGameReq.getPlayer().getS_id());
             // check if the competitor is still online and not in a game
-            if (competitor != null && !competitor.myFullInfoPlayer.isInGame()) {
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create the notification
-                GameInvitationNotification gameInvitationNotification = new GameInvitationNotification(myFullInfoPlayer);
+                GameInvitationNotification gameInvitationNotification = new GameInvitationNotification(clients.get(this.getId()).myFullInfoPlayer);
                 // create json from the notification
                 String jNotification = mapper.writeValueAsString(gameInvitationNotification);
                 // send the game invitation to the competitor
-                competitor.printStream.println(jNotification);
+                _competitor.printStream.println(jNotification);
             } else {
                 // the competitor became offline or started a new another game
-                sendOfflineOrInGame(inviteToGameReq.getPlayer(), competitor);
+                sendOfflineOrInGame(inviteToGameReq.getPlayer(), _competitor);
             }
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -114,12 +106,14 @@ public class ClientHandler extends Thread {
             // get the object from the json
             AcceptInvitationReq acceptInvitationReq = mapper.readValue(json, AcceptInvitationReq.class);
             // get the competitor
-            ClientHandler competitor = getCompetitor(acceptInvitationReq.getPlayer());
+//            ClientHandler competitor = getCompetitor(acceptInvitationReq.getPlayer());
+            ClientHandler _competitor = clients.get(acceptInvitationReq.getPlayer().getS_id());
             // check if the competitor is still online and not in a game
-            if (competitor != null && !competitor.myFullInfoPlayer.isInGame()) {
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // link the two player with each other
-                this.competitor = competitor;
-                competitor.competitor = this;
+                clients.get(this.getId()).competitor = _competitor;
+                clients.get(acceptInvitationReq.getPlayer().getS_id()).competitor = this;
+//                competitor.competitor = this;
                 // create new match
                 Match match = createMatch(acceptInvitationReq.getPlayer(), myFullInfoPlayer);
                 // create start match notification
@@ -127,21 +121,24 @@ public class ClientHandler extends Thread {
                 // create json
                 String jNotification = mapper.writeValueAsString(startGameNotification);
                 // send the notification to the two players to start the game
-                competitor.printStream.println(jNotification);
+                _competitor.printStream.println(jNotification);
                 printStream.println(jNotification);
+                // update in game status
+                clients.get(this.getId()).myFullInfoPlayer.setInGame(true);
+                clients.get(_competitor.getId()).myFullInfoPlayer.setInGame(true);
             } else {
                 // the competitor became offline or started a new another game
-                sendOfflineOrInGame(acceptInvitationReq.getPlayer(), competitor);
+                sendOfflineOrInGame(acceptInvitationReq.getPlayer(), _competitor);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
-    private void sendOfflineOrInGame(Player player, ClientHandler competitor) throws JsonProcessingException {
+    private void sendOfflineOrInGame(Player player, ClientHandler _competitor) throws JsonProcessingException {
         // create error response
         InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, player);
-        if (competitor == null) {
+        if (_competitor == null) {
             inviteToGameRes.setMessage("Your competitor became offline now.");
         } else {
             inviteToGameRes.setMessage("It seems your competitor has entered another game.");
@@ -157,16 +154,17 @@ public class ClientHandler extends Thread {
             // get the object from the json
             RejectInvitationReq rejectInvitationReq = mapper.readValue(json, RejectInvitationReq.class);
             // get the competitor
-            ClientHandler competitor = getCompetitor(rejectInvitationReq.getPlayer());
+//            ClientHandler competitor = getCompetitor(rejectInvitationReq.getPlayer());
+            ClientHandler _competitor = clients.get(rejectInvitationReq.getPlayer().getS_id());
             // check if the competitor is still online and not in a game
-            if (competitor != null && !competitor.myFullInfoPlayer.isInGame()) {
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create error response
                 InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, myFullInfoPlayer);
                 inviteToGameRes.setMessage("It seems your competitor can not play with you at this moment.");
                 // create json from response
                 String jResponse = mapper.writeValueAsString(inviteToGameRes);
                 // send the response to the client
-                competitor.printStream.println(inviteToGameRes);
+                _competitor.printStream.println(inviteToGameRes);
             }
 
         } catch (JsonProcessingException e) {
@@ -185,19 +183,54 @@ public class ClientHandler extends Thread {
         return match;
     }
 
+    private void updateBoard(String json) {
+        try {
+            // get the object from the json
+            UpdateBoardReq updateBoardReq = mapper.readValue(json, UpdateBoardReq.class);
+            //create update board notification
+            UpdateBoardNotification updateBoardNotification = new UpdateBoardNotification(updateBoardReq.getPosition());
+            // create json
+            String jNotification = mapper.writeValueAsString(updateBoardNotification);
+            // send the notification to the players
+            clients.get(this.getId()).competitor.printStream.println(jNotification);
+            printStream.println(jNotification);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
 
-    private ClientHandler getCompetitor(Player player) {
-        List<ClientHandler> competitor = clients.stream()
-                .filter(clientHandler -> clientHandler.getId() == player.getS_id()).collect(Collectors.toList());
-        if (competitor.isEmpty())
-            return null;
-        else
-            return competitor.get(0);
+    private void dropConnection() {
+        // check if were playing with a competitor
+        if (clients.get(this.getId()).competitor != null) {
+            try {
+                // notify the competitor
+                Notification notification = new Notification(Notification.NOTIFICATION_COMPETITOR_CONNECTION_ISSUE);
+                String jNotification = mapper.writeValueAsString(notification);
+                clients.get(this.getId()).competitor.printStream.println(jNotification);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
+        clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
+        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+        clients.remove(this.getId());
+    }
+
+    private void updateInGameStatus(String json) {
+        try {
+            UpdateInGameStatusReq updateInGameStatusReq = mapper.readValue(json, UpdateInGameStatusReq.class);
+            clients.get(this.getId()).myFullInfoPlayer.setInGame(updateInGameStatusReq.getInGame());
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateStatus(PlayerFullInfo playerFullInfo) {
         // update player status in the list
-        playersFullInfo.set(playerFullInfo.getIndex(), playerFullInfo);
+//        playersFullInfo.set(playerFullInfo.getIndex(), playerFullInfo);
+        playersFullInfo.put(playerFullInfo.getDb_id(), playerFullInfo);
         // create notification to send
         UpdateStatusNotification updateStatusNotification = new UpdateStatusNotification(playerFullInfo);
         try {
@@ -205,8 +238,10 @@ public class ClientHandler extends Thread {
             String jNotification = mapper.writeValueAsString(updateStatusNotification);
             // send to all client notification with now status for the player
             new Thread(() -> {
-                for (ClientHandler client : clients) {
-                    client.printStream.println(jNotification);
+                for (ClientHandler client : clients.values()) {
+                    if (client.getId() != playerFullInfo.getS_id()) {
+                        client.printStream.println(jNotification);
+                    }
                 }
             }).start();
         } catch (JsonProcessingException e) {
@@ -214,10 +249,20 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private PlayerFullInfo getPlayer(long s_id) {
-        return playersFullInfo.stream().filter(playerFullInfo -> playerFullInfo.getS_id() == s_id)
-                .collect(Collectors.toList()).get(0);
-    }
+//    private PlayerFullInfo getPlayer(long s_id) {
+//        return playersFullInfo.stream().filter(playerFullInfo -> playerFullInfo.getS_id() == s_id)
+//                .collect(Collectors.toList()).get(0);
+//    }
+
+
+//    private ClientHandler getCompetitor(Player player) {
+//        List<ClientHandler> competitor = clients.stream()
+//                .filter(clientHandler -> clientHandler.getId() == player.getS_id()).collect(Collectors.toList());
+//        if (competitor.isEmpty())
+//            return null;
+//        else
+//            return competitor.get(0);
+//    }
 
     interface IAction {
         void handleAction(String json);

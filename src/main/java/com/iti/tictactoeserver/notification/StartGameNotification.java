@@ -3,7 +3,7 @@ package com.iti.tictactoeserver.notification;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iti.tictactoeserver.models.Match;
 
-public class StartGameNotification extends Notifications {
+public class StartGameNotification extends Notification {
     private Match match;
 
     public StartGameNotification() {

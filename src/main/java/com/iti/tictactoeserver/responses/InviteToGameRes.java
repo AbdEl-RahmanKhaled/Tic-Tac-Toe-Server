@@ -3,20 +3,20 @@ package com.iti.tictactoeserver.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iti.tictactoeserver.models.Player;
 
-public class InviteToGameRes extends Responses {
+public class InviteToGameRes extends Response {
     private Player player;
 
     public InviteToGameRes(String status, Player player) {
         this.player = player;
         this.status = status;
-        type = RESPONSE_INVITE_TO_GAME;
+        this.type = RESPONSE_INVITE_TO_GAME;
     }
 
     public InviteToGameRes(String status, String message, Player player) {
         this.player = player;
         this.status = status;
         this.message = message;
-        type = RESPONSE_INVITE_TO_GAME;
+        this.type = RESPONSE_INVITE_TO_GAME;
     }
 
     public InviteToGameRes(@JsonProperty("status") String status,

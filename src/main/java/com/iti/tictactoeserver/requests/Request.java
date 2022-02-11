@@ -1,13 +1,25 @@
 package com.iti.tictactoeserver.requests;
 
-public class Requests {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Request {
     protected String action;
 
     public static final String ACTION_LOGIN = "login";
     public static final String ACTION_INVITE_TO_GAME = "inviteToGame";
     public static final String ACTION_ACCEPT_INVITATION = "acceptInvitation";
     public static final String ACTION_REJECT_INVITATION = "rejectInvitation";
+    public static final String ACTION_UPDATE_BOARD = "updateBoard";
+    public static final String ACTION_UPDATE_IN_GAME_STATUS = "updateInGameStatus";
 
+
+    public Request() {
+
+    }
+
+    public Request(@JsonProperty("action") String action) {
+        this.action = action;
+    }
 
     public String getAction() {
         return action;

@@ -2,7 +2,7 @@ package com.iti.tictactoeserver.notification;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iti.tictactoeserver.models.Player;
 
-public class GameInvitationNotification extends Notifications {
+public class GameInvitationNotification extends Notification {
     private Player player;
 
     public GameInvitationNotification() {

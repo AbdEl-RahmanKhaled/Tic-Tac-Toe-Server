@@ -3,22 +3,22 @@ package com.iti.tictactoeserver.requests;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iti.tictactoeserver.models.Player;
 
-public class AcceptInvitationReq extends Requests {
+public class AcceptInvitationReq extends Request {
     private Player player;
 
     public AcceptInvitationReq() {
-        this.action = ACTION_ACCEPT_INVITATION;
+        super(ACTION_ACCEPT_INVITATION);
     }
 
     public AcceptInvitationReq(Player player) {
+        super(ACTION_ACCEPT_INVITATION);
         this.player = player;
-        this.action = ACTION_ACCEPT_INVITATION;
     }
 
     public AcceptInvitationReq(@JsonProperty("action") String action,
                                @JsonProperty("player") Player player) {
+        super(action);
         this.player = player;
-        this.action = action;
     }
 
 

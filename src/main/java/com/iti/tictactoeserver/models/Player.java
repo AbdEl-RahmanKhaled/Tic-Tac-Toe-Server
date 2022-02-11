@@ -17,6 +17,11 @@ public class Player {
         this.s_id = s_id;
     }
 
+    public Player(int db_id, long s_id) {
+        this.db_id = db_id;
+        this.s_id = s_id;
+    }
+
     public long getS_id() {
         return s_id;
     }
