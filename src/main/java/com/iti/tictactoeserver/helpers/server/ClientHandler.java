@@ -5,6 +5,7 @@ import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
+import com.iti.tictactoeserver.models.User;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
@@ -28,6 +29,7 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
+    private User user;
 
     public ClientHandler(Socket socket) {
         initActions();
@@ -50,6 +52,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
+        //actions.put(Request.ACTION_SIGN_UP, dbConnection.signUp(user));
     }
 
 
@@ -76,6 +79,9 @@ public class ClientHandler extends Thread {
         playersFullInfo = dbConnection.getAllPlayers(true);
         System.out.println(playersFullInfo.size());
     }
+    /*private boolean signUp(User user){
+
+    }*/
 
     private void inviteToGame(String json) {
         try {

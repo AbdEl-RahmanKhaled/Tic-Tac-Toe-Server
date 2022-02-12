@@ -7,12 +7,15 @@ public class InviteToGameRes extends Response {
     private Player player;
 
     public InviteToGameRes(String status, Player player) {
+        //super(status,RESPONSE_INVITE_TO_GAME);
         this.player = player;
         this.status = status;
         this.type = RESPONSE_INVITE_TO_GAME;
+
     }
 
     public InviteToGameRes(String status, String message, Player player) {
+        //super(status,RESPONSE_INVITE_TO_GAME);
         this.player = player;
         this.status = status;
         this.message = message;
@@ -23,6 +26,7 @@ public class InviteToGameRes extends Response {
                            @JsonProperty("type") String type,
                            @JsonProperty("message") String message,
                            @JsonProperty("player") Player player) {
+        //super(message,status,RESPONSE_INVITE_TO_GAME);
         this.status = status;
         this.type = type;
         this.message = message;

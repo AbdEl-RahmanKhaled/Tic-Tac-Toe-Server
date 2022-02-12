@@ -7,6 +7,7 @@ public class Response {
 //    public static final String STATUS_REJECTED = "rejected";
 
     public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
+    public static final String RESPONSE_SIGN_UP = "signupRes";
 
     protected String message, status, type;
 
