@@ -6,6 +6,7 @@ import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
+import com.iti.tictactoeserver.models.User;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
@@ -30,6 +31,7 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
+    private User user;
 
 
     public ClientHandler(Socket socket) {
@@ -54,6 +56,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
         actions.put(Request.ACTION_LOGIN, this::Login);
+        actions.put(Request.ACTION_SIGN_UP, this::signUp);
     }
 
 
@@ -103,6 +106,26 @@ public class ClientHandler extends Thread {
         playersFullInfo = new HashMap<>();
         playersFullInfo = dbConnection.getAllPlayers(true);
         System.out.println(playersFullInfo.size());
+    }
+
+    private void signUp(String json) {
+        try {
+            SignUpReq signUpReq = mapper.readValue(json, SignUpReq.class);
+            PlayerFullInfo playerFullInfo = dbConnection.signUp(signUpReq.getUser());
+            Response response = new Response();
+            if (playerFullInfo != null) {
+                response.setStatus(Response.STATUS_OK);
+                response.setMessage("You have successfully registered");
+                playersFullInfo.put(playerFullInfo.getDb_id(), playerFullInfo);
+            } else {
+                response.setStatus(Response.STATUS_ERROR);
+                response.setMessage("Username You entered already exists!");
+            }
+            String jResponse = mapper.writeValueAsString(response);
+            printStream.println(jResponse);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void inviteToGame(String json) {

@@ -31,9 +31,9 @@ public class DbConnection {
         }
     }
 
-    public boolean signUp(User user) {
+    public PlayerFullInfo signUp(User user) {
         if (ValidateUserName(user.getUserName())) {
-            return false;
+            return null;
         } else {
             PreparedStatement pst = null;
             try {
@@ -43,10 +43,11 @@ public class DbConnection {
                 pst.setString(3, user.getPassword());
                 //pst.setInt(4, user.getPoints());
                 pst.execute();
+                return getPlayerInfo(user.getUserName());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            return true;
+            return null;
         }
     }
 
@@ -61,6 +62,16 @@ public class DbConnection {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private PlayerFullInfo getPlayerInfo(String username) throws SQLException {
+        PreparedStatement stm = connection.prepareStatement("select u_id, name, points from users where username = ?");
+        stm.setString(1, username);
+        ResultSet resultSet = stm.executeQuery();
+        resultSet.next();
+        return new PlayerFullInfo(resultSet.getInt("u_id"),
+                resultSet.getString("name"),
+                resultSet.getInt("points"));
     }
 
     public void saveMatch(Match match, List<Position> positions) {
