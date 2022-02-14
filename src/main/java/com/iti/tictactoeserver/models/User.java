@@ -1,11 +1,9 @@
 package com.iti.tictactoeserver.models;
 
 
-public class User {
+public class User extends Credentials {
     private int u_id;
     private String name;
-    private String username;
-    private String password;
     private int points;
 
     public void setId(int Id) {
@@ -14,14 +12,6 @@ public class User {
 
     public void setName(String Name) {
         name = Name;
-    }
-
-    public void setUserName(String userName) {
-        username = userName;
-    }
-
-    public void setPassword(String Password) {
-        password = Password;
     }
 
     public void setPoints(int Points) {
@@ -36,13 +26,6 @@ public class User {
         return name;
     }
 
-    public String getUserName() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 
     public int getPoints() {
         return points;

@@ -12,6 +12,7 @@ public class Notification {
     public static final String NOTIFICATION_COMPETITOR_CONNECTION_ISSUE = "competitorConnectionIssueNotification";
 
 
+
     public Notification() {
     }
 

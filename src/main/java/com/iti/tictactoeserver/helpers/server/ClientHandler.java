@@ -1,6 +1,7 @@
 package com.iti.tictactoeserver.helpers.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.Player;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -28,6 +30,7 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
+
 
     public ClientHandler(Socket socket) {
         initActions();
@@ -50,6 +53,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
+        actions.put(Request.ACTION_LOGIN, this::Login);
     }
 
 
@@ -67,6 +71,30 @@ public class ClientHandler extends Thread {
                 System.out.println("No. of Clients: " + clients.size());
                 break;
             }
+        }
+    }
+
+    public void Login(String json) {
+        try {
+            LoginReq loginReq = mapper.readValue(json, LoginReq.class);
+            LoginRes loginRes = new LoginRes();
+            int u_id = dbConnection.authenticate(loginReq.getCredentials());
+            if (u_id != -1) {
+                playersFullInfo.get(u_id).setStatus(PlayerFullInfo.ONLINE);
+                playersFullInfo.get(u_id).setS_id(this.getId());
+                clients.get(this.getId()).myFullInfoPlayer = playersFullInfo.get(u_id);
+                updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+                loginRes.setStatus(LoginRes.STATUS_OK);
+                loginRes.setPlayerFullInfo(playersFullInfo.get(u_id));
+                loginRes.setPlayerFullInfoMap(playersFullInfo);
+            } else {
+                loginRes.setStatus(LoginRes.STATUS_ERROR);
+                loginRes.setMessage("Incorrect Password or Username.");
+            }
+            String jResponse = mapper.writeValueAsString(loginRes);
+            printStream.println(jResponse);
+        } catch (SQLException | JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 

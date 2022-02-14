@@ -1,9 +1,6 @@
 package com.iti.tictactoeserver.helpers.db;
 
-import com.iti.tictactoeserver.models.Match;
-import com.iti.tictactoeserver.models.PlayerFullInfo;
-import com.iti.tictactoeserver.models.Position;
-import com.iti.tictactoeserver.models.User;
+import com.iti.tictactoeserver.models.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -166,13 +163,13 @@ public class DbConnection {
         return players;
     }
 
-    public boolean authenticate(User usr) throws SQLException {
+    public int authenticate(Credentials credentials) throws SQLException {
         Statement stmt = connection.createStatement();
-        String queryString = new String("select * from users where username='" + usr.getUserName() + "' && password='" + usr.getPassword() + "';");
+        String queryString = new String("select u_id from users where username='" + credentials.getUserName() + "' && password='" + credentials.getPassword() + "';");
         ResultSet rs = stmt.executeQuery(queryString);
         if (rs.first())
-            return true;
-        return false;
+            return rs.getInt("u_id");
+        return -1;
     }
 
     public List<Position> getPositions(Match match) {

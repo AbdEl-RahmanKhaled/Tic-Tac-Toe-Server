@@ -7,7 +7,7 @@ public class UpdateInGameStatusReq extends Request {
     private boolean inGame;
 
     public UpdateInGameStatusReq() {
-        super(ACTION_UPDATE_STATUS);
+        super(ACTION_UPDATE_IN_GAME_STATUS);
     }
 
     public UpdateInGameStatusReq(boolean inGame) {
