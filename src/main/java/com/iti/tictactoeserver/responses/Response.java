@@ -1,5 +1,7 @@
 package com.iti.tictactoeserver.responses;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Response {
     public static final String STATUS_ERROR = "error";
     public static final String STATUS_OK = "ok";
@@ -19,7 +21,9 @@ public class Response {
         this.type = type;
     }
 
-    public Response(String message, String status, String type) {
+    public Response(@JsonProperty("message") String message,
+                    @JsonProperty("status") String status,
+                    @JsonProperty("type") String type) {
         this.message = message;
         this.status = status;
         this.type = type;

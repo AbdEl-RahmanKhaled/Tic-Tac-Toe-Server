@@ -1,10 +1,7 @@
 package com.iti.tictactoeserver.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.User;
-
-import static com.iti.tictactoeserver.requests.Request.ACTION_SIGN_UP;
 
 public class SignUpReq extends Request {
     private User user;
