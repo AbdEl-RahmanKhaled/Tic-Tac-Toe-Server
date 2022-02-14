@@ -5,7 +5,6 @@ import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
-import com.iti.tictactoeserver.models.User;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
