@@ -1,7 +1,6 @@
 package com.iti.tictactoeserver.helpers.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
 import com.iti.tictactoeserver.models.Player;
@@ -21,7 +20,6 @@ import java.util.*;
 
 public class ClientHandler extends Thread {
 
-    //    private static List<ClientHandler> clients = new ArrayList<>();
     private static final DbConnection dbConnection = new DbConnection();
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<Long, ClientHandler> clients = new HashMap<>();
@@ -31,7 +29,6 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
-    private User user;
 
 
     public ClientHandler(Socket socket) {
@@ -40,7 +37,6 @@ public class ClientHandler extends Thread {
             dataInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printStream = new PrintStream(socket.getOutputStream());
             clients.put(this.getId(), this);
-//            clients.add(this);
             System.out.println("No. Clients: " + clients.size());
             start();
         } catch (IOException e) {
