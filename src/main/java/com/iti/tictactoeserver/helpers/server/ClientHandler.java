@@ -53,7 +53,8 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
-        actions.put(Request.ACTION_LOGIN, this::Login);
+        actions.put(Request.ACTION_LOGIN, this::login);
+        actions.put(Request.ACTION_ASK_TO_PAUSE, this::askToPause);
     }
 
 
@@ -74,7 +75,19 @@ public class ClientHandler extends Thread {
         }
     }
 
-    public void Login(String json) {
+    public void askToPause(String json) {
+        try {
+            Notification askToPauseNotification = new Notification(Notification.NOTIFICATION_ASK_TO_PAUSE);
+            String jNotification = mapper.writeValueAsString(askToPauseNotification);
+            clients.get(this.getId()).competitor.printStream.println(jNotification);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void login(String json) {
         try {
             LoginReq loginReq = mapper.readValue(json, LoginReq.class);
             LoginRes loginRes = new LoginRes();
