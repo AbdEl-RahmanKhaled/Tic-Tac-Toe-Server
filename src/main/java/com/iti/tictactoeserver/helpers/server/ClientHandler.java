@@ -77,8 +77,11 @@ public class ClientHandler extends Thread {
 
     public void askToPause(String json) {
         try {
+            //create notification
             Notification askToPauseNotification = new Notification(Notification.NOTIFICATION_ASK_TO_PAUSE);
+            //convert notification object to json string
             String jNotification = mapper.writeValueAsString(askToPauseNotification);
+            //send the notification to the competitor
             clients.get(this.getId()).competitor.printStream.println(jNotification);
 
         } catch (JsonProcessingException e) {
