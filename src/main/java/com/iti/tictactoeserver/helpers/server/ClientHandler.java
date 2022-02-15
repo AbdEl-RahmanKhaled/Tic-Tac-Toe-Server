@@ -50,10 +50,9 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
+        actions.put(Request.ACTION_SIGN_UP, this::signUp);
         actions.put(Request.ACTION_LOGIN, this::login);
         actions.put(Request.ACTION_ASK_TO_PAUSE, this::askToPause);
-        actions.put(Request.ACTION_LOGIN, this::Login);
-        actions.put(Request.ACTION_SIGN_UP, this::signUp);
         actions.put(Request.ACTION_ACCEPT_TO_PAUSE, this::acceptToPause);
         actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
         actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
@@ -92,7 +91,7 @@ public class ClientHandler extends Thread {
 
     }
 
-    public void Login(String json) {
+    public void login(String json) {
         try {
             LoginReq loginReq = mapper.readValue(json, LoginReq.class);
             LoginRes loginRes = new LoginRes();
@@ -200,7 +199,7 @@ public class ClientHandler extends Thread {
 
     private void rejectToPause(String json) {
         try {
-            Response response = new Response(Response.STATUS_ERROR,Response.RESPONSE_ASK_TO_PAUSE);
+            Response response = new Response(Response.STATUS_ERROR, Response.RESPONSE_ASK_TO_PAUSE);
             String jResponse = mapper.writeValueAsString(response);
             clients.get(this.getId()).competitor.printStream.println(jResponse);
         } catch (JsonProcessingException e) {
