@@ -12,6 +12,7 @@ public class Request {
     public static final String ACTION_UPDATE_BOARD = "updateBoard";
     public static final String ACTION_UPDATE_IN_GAME_STATUS = "updateInGameStatus";
     public static final String ACTION_SIGN_UP = "signup";
+    public static final String ACTION_SEND_MESSAGE = "sendMessage";
 
 
     public Request() {

@@ -52,6 +52,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
         actions.put(Request.ACTION_LOGIN, this::Login);
         actions.put(Request.ACTION_SIGN_UP, this::signUp);
+        actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
     }
 
 
@@ -118,6 +119,21 @@ public class ClientHandler extends Thread {
             }
             String jResponse = mapper.writeValueAsString(response);
             printStream.println(jResponse);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMessage(String json) {
+        try {
+            // get the object from the json
+            SendMessageReq sendMessageReq = mapper.readValue(json, SendMessageReq.class);
+            // create notification for message
+            MessageNotification messageNotification = new MessageNotification(sendMessageReq.getMessage());
+            // convert notification to json
+            String jNotification = mapper.writeValueAsString(messageNotification);
+            // get the competitor socket then send him the message
+            clients.get(this.getId()).competitor.printStream.println(jNotification);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
