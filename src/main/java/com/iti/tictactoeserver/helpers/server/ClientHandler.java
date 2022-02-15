@@ -52,6 +52,8 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
         actions.put(Request.ACTION_LOGIN, this::Login);
         actions.put(Request.ACTION_SIGN_UP, this::signUp);
+        actions.put(Request.ACTION_ACCEPT_TO_PAUSE, this::acceptToPause);
+        actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
         actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
     }
 
@@ -161,6 +163,33 @@ public class ClientHandler extends Thread {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void acceptToPause(String json) {
+        try {
+            AcceptToPauseReq acceptToPauseReq = mapper.readValue(json, AcceptToPauseReq.class);
+            dbConnection.saveMatch(acceptToPauseReq.getMatch(), acceptToPauseReq.getPositions());
+            Response response = new Response(Response.STATUS_OK, Response.RESPONSE_ASK_TO_PAUSE);
+            String jResponse = mapper.writeValueAsString(response);
+            clients.get(this.getId()).competitor.printStream.println(jResponse);
+            clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
+            clients.get(this.getId()).competitor = null;
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void rejectToPause(String json) {
+        try {
+            Response response = new Response(Response.STATUS_ERROR,Response.RESPONSE_ASK_TO_PAUSE);
+            String jResponse = mapper.writeValueAsString(response);
+            clients.get(this.getId()).competitor.printStream.println(jResponse);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void acceptInvitation(String json) {

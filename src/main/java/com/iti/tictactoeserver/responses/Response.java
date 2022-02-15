@@ -10,7 +10,8 @@ public class Response {
 
     public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
     public static final String RESPONSE_LOGIN = "loginRes";
-    public static final String RESPONSE_SIGN_UP = "signupRes";
+   // public static final String RESPONSE_SIGN_UP = "signupRes";
+    public static final String RESPONSE_ASK_TO_PAUSE = "askToPauseRes";
 
     protected String message, status, type;
 
