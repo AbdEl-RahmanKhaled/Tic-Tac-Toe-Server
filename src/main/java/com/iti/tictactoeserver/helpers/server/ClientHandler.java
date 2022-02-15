@@ -50,6 +50,8 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
         actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
+        actions.put(Request.ACTION_LOGIN, this::login);
+        actions.put(Request.ACTION_ASK_TO_PAUSE, this::askToPause);
         actions.put(Request.ACTION_LOGIN, this::Login);
         actions.put(Request.ACTION_SIGN_UP, this::signUp);
         actions.put(Request.ACTION_ACCEPT_TO_PAUSE, this::acceptToPause);
@@ -73,6 +75,21 @@ public class ClientHandler extends Thread {
                 break;
             }
         }
+    }
+
+    public void askToPause(String json) {
+        try {
+            //create notification
+            Notification askToPauseNotification = new Notification(Notification.NOTIFICATION_ASK_TO_PAUSE);
+            //convert notification object to json string
+            String jNotification = mapper.writeValueAsString(askToPauseNotification);
+            //send the notification to the competitor
+            clients.get(this.getId()).competitor.printStream.println(jNotification);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void Login(String json) {

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Response {
     public static final String STATUS_ERROR = "error";
     public static final String STATUS_OK = "ok";
-//    public static final String STATUS_ACCEPTED = "accepted";
-//    public static final String STATUS_REJECTED = "rejected";
+    public static final String STATUS_ACCEPTED = "accepted";
+    public static final String STATUS_REJECTED = "rejected";
 
     public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
     public static final String RESPONSE_LOGIN = "loginRes";
