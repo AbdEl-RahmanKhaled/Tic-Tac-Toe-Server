@@ -16,6 +16,8 @@ public class Request {
     public static final String ACTION_ACCEPT_TO_PAUSE = "acceptToPause";
     public static final String ACTION_REJECT_TO_PAUSE = "rejectToPause";
     public static final String ACTION_SEND_MESSAGE = "sendMessage";
+    public static final String ACTION_GET_MATCH_HISTORY = "getMatchHistory";
+
 
 
     public Request() {

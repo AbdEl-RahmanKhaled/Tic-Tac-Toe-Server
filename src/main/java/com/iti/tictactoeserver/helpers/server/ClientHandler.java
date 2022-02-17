@@ -56,6 +56,8 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_ACCEPT_TO_PAUSE, this::acceptToPause);
         actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
         actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
+        actions.put(Request.ACTION_GET_MATCH_HISTORY, this::getMatchHistory);
+
     }
 
 
@@ -73,6 +75,25 @@ public class ClientHandler extends Thread {
                 System.out.println("No. of Clients: " + clients.size());
                 break;
             }
+        }
+    }
+
+    public void getMatchHistory(String json) {
+        try {
+            int u_id = clients.get(this.getId()).myFullInfoPlayer.getDb_id();
+            GetMatchHistoryRes getMatchHistoryRes = new GetMatchHistoryRes();
+            List<Match> userMatches = dbConnection.getMatchHistory(u_id);
+            if(userMatches.size()!=0){
+                getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
+                String jResponse = mapper.writeValueAsString(getMatchHistoryRes);
+                printStream.println(jResponse);
+            }
+            else{
+                getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_ERROR);
+                getMatchHistoryRes.setMessage("No Matches So Far!");
+            }
+        } catch (SQLException | JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 
@@ -104,6 +125,7 @@ public class ClientHandler extends Thread {
                 loginRes.setStatus(LoginRes.STATUS_OK);
                 loginRes.setPlayerFullInfo(playersFullInfo.get(u_id));
                 loginRes.setPlayerFullInfoMap(playersFullInfo);
+
             } else {
                 loginRes.setStatus(LoginRes.STATUS_ERROR);
                 loginRes.setMessage("Incorrect Password or Username.");

@@ -200,10 +200,10 @@ public class DbConnection {
         return positions;
     }
 
-    public List<Match> getMatchHistory() throws SQLException {
+    public List<Match> getMatchHistory(int u_id) throws SQLException {
         List<Match> matches = new ArrayList<Match>();
         Statement stmt = connection.createStatement();
-        String queryString = new String("select * from matches;");
+        String queryString = new String("select * from matches where player1_id='"+u_id+"' || player2_id='"+u_id+"';");
         ResultSet rs = stmt.executeQuery(queryString);
         if (!rs.next()) {
             return null;
