@@ -80,11 +80,17 @@ public class ClientHandler extends Thread {
 
     public void getMatchHistory(String json) {
         try {
+            //get the requested client u_id
             int u_id = clients.get(this.getId()).myFullInfoPlayer.getDb_id();
+            //create response
             GetMatchHistoryRes getMatchHistoryRes = new GetMatchHistoryRes();
+            //get matches from database
             List<Match> userMatches = dbConnection.getMatchHistory(u_id);
+            //if there are matches, send them back to the client
             if(userMatches.size()!=0){
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
+                getMatchHistoryRes.setMatches(userMatches);
+                //convert the response to json String
                 String jResponse = mapper.writeValueAsString(getMatchHistoryRes);
                 printStream.println(jResponse);
             }
