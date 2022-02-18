@@ -56,6 +56,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_SAVE_MATCH, this::saveMatch);
         actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
         actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
+        actions.put(Request.ACTION_GET_MATCH_HISTORY, this::getMatchHistory);
         actions.put(Request.ACTION_ASK_TO_RESUME, this::askToResume);
         actions.put(Request.ACTION_REJECT_TO_RESUME, this::rejectToResume);
         actions.put(Request.ACTION_ACCEPT_TO_RESUME, this::acceptToResume);
@@ -76,6 +77,31 @@ public class ClientHandler extends Thread {
                 System.out.println("No. of Clients: " + clients.size());
                 break;
             }
+        }
+    }
+
+    public void getMatchHistory(String json) {
+        try {
+            //get the requested client u_id
+            int u_id = clients.get(this.getId()).myFullInfoPlayer.getDb_id();
+            //create response
+            GetMatchHistoryRes getMatchHistoryRes = new GetMatchHistoryRes();
+            //get matches from database
+            List<Match> userMatches = dbConnection.getMatchHistory(u_id);
+            //if there are matches, send them back to the client
+            if(userMatches.size()!=0){
+                getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
+                getMatchHistoryRes.setMatches(userMatches);
+                //convert the response to json String
+                String jResponse = mapper.writeValueAsString(getMatchHistoryRes);
+                printStream.println(jResponse);
+            }
+            else{
+                getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_ERROR);
+                getMatchHistoryRes.setMessage("No Matches So Far!");
+            }
+        } catch (SQLException | JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 
@@ -107,6 +133,7 @@ public class ClientHandler extends Thread {
                 loginRes.setStatus(LoginRes.STATUS_OK);
                 loginRes.setPlayerFullInfo(playersFullInfo.get(u_id));
                 loginRes.setPlayerFullInfoMap(playersFullInfo);
+
             } else {
                 loginRes.setStatus(LoginRes.STATUS_ERROR);
                 loginRes.setMessage("Incorrect Password or Username.");

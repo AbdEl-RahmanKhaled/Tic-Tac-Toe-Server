@@ -19,6 +19,8 @@ public class Request {
     public static final String ACTION_ASK_TO_RESUME = "askToResume";
     public static final String ACTION_REJECT_TO_RESUME = "rejectToResume";
     public static final String ACTION_ACCEPT_TO_RESUME = "acceptToResume";
+    public static final String ACTION_GET_MATCH_HISTORY = "getMatchHistory";
+
 
 
     public Request() {

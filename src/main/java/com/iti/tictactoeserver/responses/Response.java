@@ -10,6 +10,7 @@ public class Response {
     public static final String RESPONSE_SIGN_UP = "signupRes";
     public static final String RESPONSE_ASK_TO_PAUSE = "askToPauseRes";
     public static final String RESPONSE_ASK_TO_RESUME = "askToResumeRes";
+    public static final String RESPONSE_GET_MATCH_HISTORY = "getMatchHistoryRes";
 
     protected String message, status, type;
 
