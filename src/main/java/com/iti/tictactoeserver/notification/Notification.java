@@ -12,6 +12,9 @@ public class Notification {
     public static final String NOTIFICATION_COMPETITOR_CONNECTION_ISSUE = "competitorConnectionIssueNotification";
     public static final String NOTIFICATION_ASK_TO_PAUSE = "askToPauseNotification";
     public static final String NOTIFICATION_MESSAGE = "messageNotification";
+    public static final String NOTIFICATION_FINISH_GAME = "finishGameNotification";
+    public static final String NOTIFICATION_ASK_TO_RESUME = "askToResumeNotification";
+    public static final String NOTIFICATION_RESUME_GAME = "resumeGameNotification";
 
 
 
