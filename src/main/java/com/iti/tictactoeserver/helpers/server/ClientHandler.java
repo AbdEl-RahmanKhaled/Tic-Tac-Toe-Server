@@ -89,14 +89,13 @@ public class ClientHandler extends Thread {
             //get matches from database
             List<Match> userMatches = dbConnection.getMatchHistory(u_id);
             //if there are matches, send them back to the client
-            if(userMatches.size()!=0){
+            if (userMatches.size() != 0) {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
                 getMatchHistoryRes.setMatches(userMatches);
                 //convert the response to json String
                 String jResponse = mapper.writeValueAsString(getMatchHistoryRes);
                 printStream.println(jResponse);
-            }
-            else{
+            } else {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_ERROR);
                 getMatchHistoryRes.setMessage("No Matches So Far!");
             }
@@ -425,10 +424,13 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
         }
-        clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
-        clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
-        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
-        clients.remove(this.getId());
+        // if not logged in
+        if (clients.get(this.getId()).myFullInfoPlayer != null) {
+            clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
+            clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+            clients.remove(this.getId());
+        }
     }
 
     private void updateInGameStatus(String json) {
