@@ -54,7 +54,7 @@ public class DbConnection {
     public boolean ValidateUserName(String user_name) {
         PreparedStatement p = null;
         try {
-            p = connection.prepareStatement("select * from user where userName = ?");
+            p = connection.prepareStatement("select * from user where username = ?");
             p.setString(1, user_name);
             ResultSet result = p.executeQuery();
             return result.next();
