@@ -8,6 +8,7 @@ import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
+import javafx.scene.paint.Stop;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,6 +29,7 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
+    private Socket mySocket;
 
 
     public ClientHandler(Socket socket) {
@@ -37,6 +39,7 @@ public class ClientHandler extends Thread {
             printStream = new PrintStream(socket.getOutputStream());
             clients.put(this.getId(), this);
             System.out.println("No. Clients: " + clients.size());
+            mySocket = socket;
             start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,11 +56,13 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_SIGN_UP, this::signUp);
         actions.put(Request.ACTION_LOGIN, this::login);
         actions.put(Request.ACTION_ASK_TO_PAUSE, this::askToPause);
-        actions.put(Request.ACTION_ACCEPT_TO_PAUSE, this::acceptToPause);
+        actions.put(Request.ACTION_SAVE_MATCH, this::saveMatch);
         actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
         actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
         actions.put(Request.ACTION_GET_MATCH_HISTORY, this::getMatchHistory);
-
+        actions.put(Request.ACTION_ASK_TO_RESUME, this::askToResume);
+        actions.put(Request.ACTION_REJECT_TO_RESUME, this::rejectToResume);
+        actions.put(Request.ACTION_ACCEPT_TO_RESUME, this::acceptToResume);
     }
 
 
@@ -66,6 +71,7 @@ public class ClientHandler extends Thread {
         while (true) {
             try {
                 String jRequest = dataInputStream.readLine();
+                System.out.println(jRequest);
                 JSONObject json = new JSONObject(jRequest);
                 String clientAction = (String) json.get("action");
                 actions.get(clientAction).handleAction(jRequest);
@@ -87,14 +93,13 @@ public class ClientHandler extends Thread {
             //get matches from database
             List<Match> userMatches = dbConnection.getMatchHistory(u_id);
             //if there are matches, send them back to the client
-            if(userMatches.size()!=0){
+            if (userMatches.size() != 0) {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
                 getMatchHistoryRes.setMatches(userMatches);
                 //convert the response to json String
                 String jResponse = mapper.writeValueAsString(getMatchHistoryRes);
                 printStream.println(jResponse);
-            }
-            else{
+            } else {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_ERROR);
                 getMatchHistoryRes.setMessage("No Matches So Far!");
             }
@@ -123,6 +128,7 @@ public class ClientHandler extends Thread {
             LoginReq loginReq = mapper.readValue(json, LoginReq.class);
             LoginRes loginRes = new LoginRes();
             int u_id = dbConnection.authenticate(loginReq.getCredentials());
+            System.out.println(u_id);
             if (u_id != -1) {
                 playersFullInfo.get(u_id).setStatus(PlayerFullInfo.ONLINE);
                 playersFullInfo.get(u_id).setS_id(this.getId());
@@ -131,12 +137,12 @@ public class ClientHandler extends Thread {
                 loginRes.setStatus(LoginRes.STATUS_OK);
                 loginRes.setPlayerFullInfo(playersFullInfo.get(u_id));
                 loginRes.setPlayerFullInfoMap(playersFullInfo);
-
             } else {
                 loginRes.setStatus(LoginRes.STATUS_ERROR);
                 loginRes.setMessage("Incorrect Password or Username.");
             }
             String jResponse = mapper.writeValueAsString(loginRes);
+            System.out.println(jResponse);
             printStream.println(jResponse);
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
@@ -154,7 +160,7 @@ public class ClientHandler extends Thread {
         try {
             SignUpReq signUpReq = mapper.readValue(json, SignUpReq.class);
             PlayerFullInfo playerFullInfo = dbConnection.signUp(signUpReq.getUser());
-            Response response = new Response();
+            Response response = new Response(Response.RESPONSE_SIGN_UP);
             if (playerFullInfo != null) {
                 response.setStatus(Response.STATUS_OK);
                 response.setMessage("You have successfully registered");
@@ -209,16 +215,15 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private void acceptToPause(String json) {
+    private void saveMatch(String json) {
         try {
-            AcceptToPauseReq acceptToPauseReq = mapper.readValue(json, AcceptToPauseReq.class);
-            dbConnection.saveMatch(acceptToPauseReq.getMatch(), acceptToPauseReq.getPositions());
-            Response response = new Response(Response.STATUS_OK, Response.RESPONSE_ASK_TO_PAUSE);
-            String jResponse = mapper.writeValueAsString(response);
+            SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
+            dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
+            Notification notification = new Notification(Notification.NOTIFICATION_FINISH_GAME);
+            String jResponse = mapper.writeValueAsString(notification);
             clients.get(this.getId()).competitor.printStream.println(jResponse);
             clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
             clients.get(this.getId()).competitor = null;
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -236,19 +241,95 @@ public class ClientHandler extends Thread {
 
     }
 
+    private void askToResume(String json) {
+        try {
+            // get object from json
+            AskToResumeReq askToResumeReq = mapper.readValue(json, AskToResumeReq.class);
+            // get competitor
+            ClientHandler _competitor = clients.get(askToResumeReq.getPlayer().getS_id());
+            // check if the competitor is still online and not in a game
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
+                // create the notification
+                AskToResumeNotification askToResumeNotification = new AskToResumeNotification(
+                        clients.get(this.getId()).myFullInfoPlayer, askToResumeReq.getMatch());
+                // create json from the notification
+                String jNotification = mapper.writeValueAsString(askToResumeNotification);
+                // send the game invitation to the competitor
+                _competitor.printStream.println(jNotification);
+            } else {
+                // the competitor became offline or started a new another game
+                sendOfflineOrInGame(askToResumeReq.getPlayer(), _competitor);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void rejectToResume(String json) {
+        try {
+            // get object from json
+            RejectToResumeReq rejectToResumeReq = mapper.readValue(json, RejectToResumeReq.class);
+            // get the competitor
+            ClientHandler _competitor = clients.get(rejectToResumeReq.getPlayer().getS_id());
+            // check if the competitor is still online and not in a game
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
+                // create error response
+                AskToResumeRes askToResumeRes = new AskToResumeRes(AskToResumeRes.STATUS_ERROR, clients.get(this.getId()).myFullInfoPlayer);
+                askToResumeRes.setMessage("It seems your competitor can not resume the game at this moment.");
+                // create json from response
+                String jResponse = mapper.writeValueAsString(askToResumeRes);
+                // send the response to the client
+                _competitor.printStream.println(jResponse);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void acceptToResume(String json) {
+        try {
+            AcceptToResumeReq acceptToResumeReq = mapper.readValue(json, AcceptToResumeReq.class);
+            // get the competitor
+            ClientHandler _competitor = clients.get(acceptToResumeReq.getPlayer().getS_id());
+            // check if the competitor is still online and not in a game
+            if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
+                // link the two player with each other
+                clients.get(this.getId()).competitor = _competitor;
+                clients.get(acceptToResumeReq.getPlayer().getS_id()).competitor = this;
+                // create resume match notification
+                ResumeGameNotification resumeGameNotification = new ResumeGameNotification(acceptToResumeReq.getMatch(),
+                        dbConnection.getPositions(acceptToResumeReq.getMatch()));
+                // create json
+                String jNotification = mapper.writeValueAsString(resumeGameNotification);
+                // send the notification to the two players to start the game
+                _competitor.printStream.println(jNotification);
+                printStream.println(jNotification);
+                // update in game status
+                clients.get(this.getId()).myFullInfoPlayer.setInGame(true);
+                clients.get(_competitor.getId()).myFullInfoPlayer.setInGame(true);
+                // cast the status to all
+                updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+                updateStatus(clients.get(_competitor.getId()).myFullInfoPlayer);
+            } else {
+                // the competitor became offline or started a new another game
+                sendOfflineOrInGame(acceptToResumeReq.getPlayer(), _competitor);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void acceptInvitation(String json) {
         try {
             // get the object from the json
             AcceptInvitationReq acceptInvitationReq = mapper.readValue(json, AcceptInvitationReq.class);
             // get the competitor
-//            ClientHandler competitor = getCompetitor(acceptInvitationReq.getPlayer());
             ClientHandler _competitor = clients.get(acceptInvitationReq.getPlayer().getS_id());
             // check if the competitor is still online and not in a game
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // link the two player with each other
                 clients.get(this.getId()).competitor = _competitor;
                 clients.get(acceptInvitationReq.getPlayer().getS_id()).competitor = this;
-//                competitor.competitor = this;
                 // create new match
                 Match match = createMatch(acceptInvitationReq.getPlayer(), myFullInfoPlayer);
                 // create start match notification
@@ -261,6 +342,9 @@ public class ClientHandler extends Thread {
                 // update in game status
                 clients.get(this.getId()).myFullInfoPlayer.setInGame(true);
                 clients.get(_competitor.getId()).myFullInfoPlayer.setInGame(true);
+                // cast the status to all
+                updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+                updateStatus(clients.get(_competitor.getId()).myFullInfoPlayer);
             } else {
                 // the competitor became offline or started a new another game
                 sendOfflineOrInGame(acceptInvitationReq.getPlayer(), _competitor);
@@ -289,17 +373,16 @@ public class ClientHandler extends Thread {
             // get the object from the json
             RejectInvitationReq rejectInvitationReq = mapper.readValue(json, RejectInvitationReq.class);
             // get the competitor
-//            ClientHandler competitor = getCompetitor(rejectInvitationReq.getPlayer());
             ClientHandler _competitor = clients.get(rejectInvitationReq.getPlayer().getS_id());
             // check if the competitor is still online and not in a game
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create error response
-                InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, myFullInfoPlayer);
+                InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, clients.get(this.getId()).myFullInfoPlayer);
                 inviteToGameRes.setMessage("It seems your competitor can not play with you at this moment.");
                 // create json from response
                 String jResponse = mapper.writeValueAsString(inviteToGameRes);
                 // send the response to the client
-                _competitor.printStream.println(inviteToGameRes);
+                _competitor.printStream.println(jResponse);
             }
 
         } catch (JsonProcessingException e) {
@@ -346,9 +429,12 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
         }
-        clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
-        clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
-        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+        // if not logged in
+        if (clients.get(this.getId()).myFullInfoPlayer != null) {
+            clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
+            clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+        }
         clients.remove(this.getId());
     }
 
@@ -384,7 +470,23 @@ public class ClientHandler extends Thread {
         }
     }
 
-//    private PlayerFullInfo getPlayer(long s_id) {
+    public static void stopAll() {
+        for(ClientHandler client: clients.values()) {
+            client.interrupt();
+        }
+    }
+
+    @Override
+    public void interrupt() {
+        super.interrupt();
+        try {
+            mySocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //    private PlayerFullInfo getPlayer(long s_id) {
 //        return playersFullInfo.stream().filter(playerFullInfo -> playerFullInfo.getS_id() == s_id)
 //                .collect(Collectors.toList()).get(0);
 //    }

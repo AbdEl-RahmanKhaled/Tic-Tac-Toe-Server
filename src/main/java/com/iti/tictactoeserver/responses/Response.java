@@ -5,18 +5,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Response {
     public static final String STATUS_ERROR = "error";
     public static final String STATUS_OK = "ok";
-    public static final String STATUS_ACCEPTED = "accepted";
-    public static final String STATUS_REJECTED = "rejected";
-
     public static final String RESPONSE_INVITE_TO_GAME = "inviteToGameRes";
     public static final String RESPONSE_LOGIN = "loginRes";
-   // public static final String RESPONSE_SIGN_UP = "signupRes";
+    public static final String RESPONSE_SIGN_UP = "signupRes";
     public static final String RESPONSE_ASK_TO_PAUSE = "askToPauseRes";
+    public static final String RESPONSE_ASK_TO_RESUME = "askToResumeRes";
     public static final String RESPONSE_GET_MATCH_HISTORY = "getMatchHistoryRes";
 
     protected String message, status, type;
 
     public Response() {
+    }
+
+    public Response(String type) {
+        this.type = type;
     }
 
     public Response(String status, String type) {
