@@ -8,6 +8,7 @@ import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
+import javafx.scene.paint.Stop;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,6 +29,7 @@ public class ClientHandler extends Thread {
     private BufferedReader dataInputStream;
     private ClientHandler competitor;
     private PlayerFullInfo myFullInfoPlayer;
+    private Socket mySocket;
 
 
     public ClientHandler(Socket socket) {
@@ -37,6 +39,7 @@ public class ClientHandler extends Thread {
             printStream = new PrintStream(socket.getOutputStream());
             clients.put(this.getId(), this);
             System.out.println("No. Clients: " + clients.size());
+            mySocket = socket;
             start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,6 +71,7 @@ public class ClientHandler extends Thread {
         while (true) {
             try {
                 String jRequest = dataInputStream.readLine();
+                System.out.println(jRequest);
                 JSONObject json = new JSONObject(jRequest);
                 String clientAction = (String) json.get("action");
                 actions.get(clientAction).handleAction(jRequest);
@@ -124,6 +128,7 @@ public class ClientHandler extends Thread {
             LoginReq loginReq = mapper.readValue(json, LoginReq.class);
             LoginRes loginRes = new LoginRes();
             int u_id = dbConnection.authenticate(loginReq.getCredentials());
+            System.out.println(u_id);
             if (u_id != -1) {
                 playersFullInfo.get(u_id).setStatus(PlayerFullInfo.ONLINE);
                 playersFullInfo.get(u_id).setS_id(this.getId());
@@ -132,12 +137,12 @@ public class ClientHandler extends Thread {
                 loginRes.setStatus(LoginRes.STATUS_OK);
                 loginRes.setPlayerFullInfo(playersFullInfo.get(u_id));
                 loginRes.setPlayerFullInfoMap(playersFullInfo);
-
             } else {
                 loginRes.setStatus(LoginRes.STATUS_ERROR);
                 loginRes.setMessage("Incorrect Password or Username.");
             }
             String jResponse = mapper.writeValueAsString(loginRes);
+            System.out.println(jResponse);
             printStream.println(jResponse);
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
@@ -429,8 +434,8 @@ public class ClientHandler extends Thread {
             clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
             clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
             updateStatus(clients.get(this.getId()).myFullInfoPlayer);
-            clients.remove(this.getId());
         }
+        clients.remove(this.getId());
     }
 
     private void updateInGameStatus(String json) {
@@ -465,7 +470,23 @@ public class ClientHandler extends Thread {
         }
     }
 
-//    private PlayerFullInfo getPlayer(long s_id) {
+    public static void stopAll() {
+        for(ClientHandler client: clients.values()) {
+            client.interrupt();
+        }
+    }
+
+    @Override
+    public void interrupt() {
+        super.interrupt();
+        try {
+            mySocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //    private PlayerFullInfo getPlayer(long s_id) {
 //        return playersFullInfo.stream().filter(playerFullInfo -> playerFullInfo.getS_id() == s_id)
 //                .collect(Collectors.toList()).get(0);
 //    }

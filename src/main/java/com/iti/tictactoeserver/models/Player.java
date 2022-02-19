@@ -3,19 +3,13 @@ package com.iti.tictactoeserver.models;
 public class Player {
     public static final String ONLINE = "online";
     public static final String OFFLINE = "offline";
-    protected int db_id, index;
+    protected int db_id;
     protected long s_id;
 
 
     public Player() {
     }
 
-
-    public Player(int db_id, int index, long s_id) {
-        this.db_id = db_id;
-        this.index = index;
-        this.s_id = s_id;
-    }
 
     public Player(int db_id, long s_id) {
         this.db_id = db_id;
@@ -38,11 +32,8 @@ public class Player {
         this.db_id = db_id;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
-    }
 }
+
+
+
+

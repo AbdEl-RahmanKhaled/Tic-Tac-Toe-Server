@@ -13,5 +13,9 @@ module com.iti.tictactoeserver {
     exports com.iti.tictactoeserver;
     exports com.iti.tictactoeserver.controllers;
     opens com.iti.tictactoeserver.controllers to javafx.fxml;
+    exports com.iti.tictactoeserver.requests to com.fasterxml.jackson.databind;
+    exports com.iti.tictactoeserver.responses to com.fasterxml.jackson.databind;
+    exports com.iti.tictactoeserver.models to com.fasterxml.jackson.databind;
+    exports com.iti.tictactoeserver.notification to com.fasterxml.jackson.databind;
 
 }
