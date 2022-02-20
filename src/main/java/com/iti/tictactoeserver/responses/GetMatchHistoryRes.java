@@ -9,11 +9,13 @@ public class GetMatchHistoryRes extends Response{
     private List<Match> matches;
 
     public GetMatchHistoryRes() {
+        this.type = RESPONSE_GET_MATCH_HISTORY;
     }
 
-    public GetMatchHistoryRes(String status, String type, List<Match> matches) {
-        super(status, type);
+    public GetMatchHistoryRes(String status,  List<Match> matches) {
         this.matches = matches;
+        this.type = RESPONSE_GET_MATCH_HISTORY;
+        this.status = status;
     }
 
     public GetMatchHistoryRes(@JsonProperty("status") String status,

@@ -12,11 +12,14 @@ public class ResumeGameNotification extends Notification {
     private List<Position> positions;
 
     public ResumeGameNotification() {
+        this.type = NOTIFICATION_RESUME_GAME;
     }
 
     public ResumeGameNotification(Match match, List<Position> positions) {
         this.match = match;
         this.positions = positions;
+        this.type = NOTIFICATION_RESUME_GAME;
+
     }
 
     public ResumeGameNotification(@JsonProperty("type") String type,

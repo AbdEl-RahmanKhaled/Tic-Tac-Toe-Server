@@ -10,6 +10,10 @@ public class Player {
     public Player() {
     }
 
+    public Player(PlayerFullInfo playerFullInfo) {
+        this.s_id = playerFullInfo.s_id;
+        this.db_id = playerFullInfo.db_id;
+    }
 
     public Player(int db_id, long s_id) {
         this.db_id = db_id;

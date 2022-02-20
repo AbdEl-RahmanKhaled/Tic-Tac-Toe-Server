@@ -111,7 +111,7 @@ public class ClientHandler extends Thread {
     public void askToPause(String json) {
         try {
             //create notification
-            Notification askToPauseNotification = new Notification(Notification.NOTIFICATION_ASK_TO_PAUSE);
+            AskToPauseNotification askToPauseNotification = new AskToPauseNotification();
             //convert notification object to json string
             String jNotification = mapper.writeValueAsString(askToPauseNotification);
             //send the notification to the competitor
@@ -128,7 +128,6 @@ public class ClientHandler extends Thread {
             LoginReq loginReq = mapper.readValue(json, LoginReq.class);
             LoginRes loginRes = new LoginRes();
             int u_id = dbConnection.authenticate(loginReq.getCredentials());
-            System.out.println(u_id);
             if (u_id != -1) {
                 playersFullInfo.get(u_id).setStatus(PlayerFullInfo.ONLINE);
                 playersFullInfo.get(u_id).setS_id(this.getId());
@@ -160,16 +159,17 @@ public class ClientHandler extends Thread {
         try {
             SignUpReq signUpReq = mapper.readValue(json, SignUpReq.class);
             PlayerFullInfo playerFullInfo = dbConnection.signUp(signUpReq.getUser());
-            Response response = new Response(Response.RESPONSE_SIGN_UP);
+            SignUpRes signUpRes = new SignUpRes();
             if (playerFullInfo != null) {
-                response.setStatus(Response.STATUS_OK);
-                response.setMessage("You have successfully registered");
+                signUpRes.setStatus(Response.STATUS_OK);
+                signUpRes.setMessage("You have successfully registered");
                 playersFullInfo.put(playerFullInfo.getDb_id(), playerFullInfo);
+                updateStatus(playerFullInfo);
             } else {
-                response.setStatus(Response.STATUS_ERROR);
-                response.setMessage("Username You entered already exists!");
+                signUpRes.setStatus(Response.STATUS_ERROR);
+                signUpRes.setMessage("Username You entered already exists!");
             }
-            String jResponse = mapper.writeValueAsString(response);
+            String jResponse = mapper.writeValueAsString(signUpRes);
             printStream.println(jResponse);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -201,7 +201,7 @@ public class ClientHandler extends Thread {
             // check if the competitor is still online and not in a game
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create the notification
-                GameInvitationNotification gameInvitationNotification = new GameInvitationNotification(clients.get(this.getId()).myFullInfoPlayer);
+                GameInvitationNotification gameInvitationNotification = new GameInvitationNotification(new Player(clients.get(this.getId()).myFullInfoPlayer));
                 // create json from the notification
                 String jNotification = mapper.writeValueAsString(gameInvitationNotification);
                 // send the game invitation to the competitor
@@ -219,8 +219,8 @@ public class ClientHandler extends Thread {
         try {
             SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
             dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
-            Notification notification = new Notification(Notification.NOTIFICATION_FINISH_GAME);
-            String jResponse = mapper.writeValueAsString(notification);
+            FinishGameNotification finishGameNotification = new FinishGameNotification();
+            String jResponse = mapper.writeValueAsString(finishGameNotification);
             clients.get(this.getId()).competitor.printStream.println(jResponse);
             clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
             clients.get(this.getId()).competitor = null;
@@ -251,7 +251,7 @@ public class ClientHandler extends Thread {
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create the notification
                 AskToResumeNotification askToResumeNotification = new AskToResumeNotification(
-                        clients.get(this.getId()).myFullInfoPlayer, askToResumeReq.getMatch());
+                        new Player(clients.get(this.getId()).myFullInfoPlayer), askToResumeReq.getMatch());
                 // create json from the notification
                 String jNotification = mapper.writeValueAsString(askToResumeNotification);
                 // send the game invitation to the competitor
@@ -422,8 +422,8 @@ public class ClientHandler extends Thread {
         if (clients.get(this.getId()).competitor != null) {
             try {
                 // notify the competitor
-                Notification notification = new Notification(Notification.NOTIFICATION_COMPETITOR_CONNECTION_ISSUE);
-                String jNotification = mapper.writeValueAsString(notification);
+                CompetitorConnectionIssueNotification competitorConnectionIssueNotification = new CompetitorConnectionIssueNotification();
+                String jNotification = mapper.writeValueAsString(competitorConnectionIssueNotification);
                 clients.get(this.getId()).competitor.printStream.println(jNotification);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -471,7 +471,7 @@ public class ClientHandler extends Thread {
     }
 
     public static void stopAll() {
-        for(ClientHandler client: clients.values()) {
+        for (ClientHandler client : clients.values()) {
             client.interrupt();
         }
     }
