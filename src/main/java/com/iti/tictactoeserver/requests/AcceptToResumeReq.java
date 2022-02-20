@@ -10,11 +10,11 @@ public class AcceptToResumeReq extends Request {
     private Match match;
 
     public AcceptToResumeReq() {
-        super(ACTION_ACCEPT_INVITATION);
+        super(ACTION_ACCEPT_TO_RESUME);
     }
 
     public AcceptToResumeReq(Player player, Match match) {
-        super(ACTION_ACCEPT_INVITATION);
+        super(ACTION_ACCEPT_TO_RESUME);
         this.player = player;
         this.match = match;
     }

@@ -21,7 +21,7 @@ public class Request {
     public static final String ACTION_REJECT_TO_RESUME = "rejectToResume";
     public static final String ACTION_ACCEPT_TO_RESUME = "acceptToResume";
     public static final String ACTION_GET_MATCH_HISTORY = "getMatchHistory";
-
+    public static final String ACTION_BACK_FROM_OFFLINE = "backFromOffline";
 
 
     public Request() {

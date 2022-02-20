@@ -23,7 +23,7 @@ public class LoginRes extends Response{
     public LoginRes(String status, PlayerFullInfo playerFullInfo, Map<Integer,PlayerFullInfo> playerFullInfoMap) {
         this.playerFullInfo = playerFullInfo;
         this.status = status;
-        this.type = RESPONSE_INVITE_TO_GAME;
+        this.type = RESPONSE_LOGIN;
         this.playerFullInfoMap=playerFullInfoMap;
     }
 

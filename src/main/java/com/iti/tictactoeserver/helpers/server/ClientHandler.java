@@ -63,6 +63,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_ASK_TO_RESUME, this::askToResume);
         actions.put(Request.ACTION_REJECT_TO_RESUME, this::rejectToResume);
         actions.put(Request.ACTION_ACCEPT_TO_RESUME, this::acceptToResume);
+        actions.put(Request.ACTION_BACK_FROM_OFFLINE, this::backFromOffline);
     }
 
 
@@ -186,6 +187,25 @@ public class ClientHandler extends Thread {
             String jNotification = mapper.writeValueAsString(messageNotification);
             // get the competitor socket then send him the message
             clients.get(this.getId()).competitor.printStream.println(jNotification);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void backFromOffline(String json) {
+        try {
+            BackFromOfflineReq backFromOfflineReq = mapper.readValue(json, BackFromOfflineReq.class);
+            playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id()).setS_id(this.getId());
+            playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id()).setStatus(Player.ONLINE);
+            clients.get(this.getId()).myFullInfoPlayer =  playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id());
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+            LoginRes loginRes = new LoginRes(
+                    LoginRes.STATUS_OK,
+                    clients.get(this.getId()).myFullInfoPlayer,
+                    playersFullInfo
+            );
+            String jResponse = mapper.writeValueAsString(loginRes);
+            printStream.println(jResponse);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
