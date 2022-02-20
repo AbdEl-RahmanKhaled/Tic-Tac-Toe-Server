@@ -17,5 +17,6 @@ module com.iti.tictactoeserver {
     exports com.iti.tictactoeserver.notification;
     exports com.iti.tictactoeserver.requests;
     exports com.iti.tictactoeserver.responses;
+    exports com.iti.tictactoeserver.models;
 
 }

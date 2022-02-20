@@ -33,6 +33,7 @@ public class LoginRes extends Response{
         this.status = status;
         this.message = message;
         this.type = RESPONSE_LOGIN;
+
     }
 
     public LoginRes(@JsonProperty("status") String status,
@@ -44,6 +45,8 @@ public class LoginRes extends Response{
         this.type = type;
         this.message = message;
         this.playerFullInfo = playerFullInfo;
+        this.playerFullInfoMap = playerFullInfoMap;
+
     }
 
     public PlayerFullInfo getPlayerFullInfo() {

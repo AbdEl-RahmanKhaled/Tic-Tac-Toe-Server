@@ -460,7 +460,7 @@ public class ClientHandler extends Thread {
             // send to all client notification with now status for the player
             new Thread(() -> {
                 for (ClientHandler client : clients.values()) {
-                    if (client.getId() != playerFullInfo.getS_id()) {
+                    if (client.getId() != playerFullInfo.getS_id() && client.myFullInfoPlayer != null) {
                         client.printStream.println(jNotification);
                     }
                 }

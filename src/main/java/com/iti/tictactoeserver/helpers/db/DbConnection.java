@@ -175,10 +175,10 @@ public class DbConnection {
     }
 
     public int authenticate(Credentials credentials) throws SQLException {
-        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        Statement stmt = connection.createStatement();
         String queryString = new String("select u_id from users where username='" + credentials.getUserName() + "' and password='" + credentials.getPassword() + "';");
         ResultSet rs = stmt.executeQuery(queryString);
-        if (rs.first())
+        if (rs.next())
             return rs.getInt("u_id");
         return -1;
     }
