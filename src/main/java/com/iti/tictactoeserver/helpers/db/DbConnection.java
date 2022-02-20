@@ -32,6 +32,7 @@ public class DbConnection {
     }
 
     public PlayerFullInfo signUp(User user) {
+        System.out.println(ValidateUserName(user.getUserName()));
         if (ValidateUserName(user.getUserName())) {
             return null;
         } else {
@@ -54,7 +55,7 @@ public class DbConnection {
     public boolean ValidateUserName(String user_name) {
         PreparedStatement p = null;
         try {
-            p = connection.prepareStatement("select * from user where username = ?");
+            p = connection.prepareStatement("select * from users where username = ?");
             p.setString(1, user_name);
             ResultSet result = p.executeQuery();
             return result.next();
