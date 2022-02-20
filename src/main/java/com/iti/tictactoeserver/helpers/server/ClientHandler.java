@@ -48,10 +48,10 @@ public class ClientHandler extends Thread {
 
     private void initActions() {
         actions = new HashMap<>();
-        actions.put(Request.ACTION_INVITE_TO_GAME, this::inviteToGame);
+        actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
         actions.put(Request.ACTION_ACCEPT_INVITATION, this::acceptInvitation);
         actions.put(Request.ACTION_REJECT_INVITATION, this::rejectInvitation);
-        actions.put(Request.ACTION_UPDATE_BOARD, this::updateBoard);
+        actions.put(Request.ACTION_INVITE_TO_GAME, this::inviteToGame);
         actions.put(Request.ACTION_UPDATE_IN_GAME_STATUS, this::updateInGameStatus);
         actions.put(Request.ACTION_SIGN_UP, this::signUp);
         actions.put(Request.ACTION_LOGIN, this::login);
@@ -111,7 +111,8 @@ public class ClientHandler extends Thread {
     public void askToPause(String json) {
         try {
             //create notification
-            Notification askToPauseNotification = new Notification(Notification.NOTIFICATION_ASK_TO_PAUSE);
+            AskToPauseNotification askToPauseNotification = new AskToPauseNotification(clients.get(this.getId()).myFullInfoPlayer);
+            System.out.println(clients.get(this.getId()).myFullInfoPlayer.getName());
             //convert notification object to json string
             String jNotification = mapper.writeValueAsString(askToPauseNotification);
             //send the notification to the competitor
