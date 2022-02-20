@@ -9,13 +9,13 @@ module com.iti.tictactoeserver {
     requires com.fasterxml.jackson.databind;
 
 
-    opens com.iti.tictactoeserver to javafx.fxml;
+    opens com.iti.tictactoeserver ;
     exports com.iti.tictactoeserver;
     exports com.iti.tictactoeserver.controllers;
     opens com.iti.tictactoeserver.controllers to javafx.fxml;
-    exports com.iti.tictactoeserver.requests to com.fasterxml.jackson.databind;
-    exports com.iti.tictactoeserver.responses to com.fasterxml.jackson.databind;
-    exports com.iti.tictactoeserver.models to com.fasterxml.jackson.databind;
-    exports com.iti.tictactoeserver.notification to com.fasterxml.jackson.databind;
+    opens com.iti.tictactoeserver.models;
+    exports com.iti.tictactoeserver.notification;
+    exports com.iti.tictactoeserver.requests;
+    exports com.iti.tictactoeserver.responses;
 
 }

@@ -175,10 +175,10 @@ public class DbConnection {
     }
 
     public int authenticate(Credentials credentials) throws SQLException {
-        Statement stmt = connection.createStatement();
-        String queryString = "select u_id from users where username = '" + credentials.getUserName() + "' and password = '" + credentials.getPassword() + "';";
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String queryString = new String("select u_id from users where username='" + credentials.getUserName() + "' and password='" + credentials.getPassword() + "';");
         ResultSet rs = stmt.executeQuery(queryString);
-        if (rs.next())
+        if (rs.first())
             return rs.getInt("u_id");
         return -1;
     }
@@ -202,8 +202,8 @@ public class DbConnection {
 
     public List<Match> getMatchHistory(int u_id) throws SQLException {
         List<Match> matches = new ArrayList<Match>();
-        Statement stmt = connection.createStatement();
-        String queryString = new String("select * from matches where player1_id='"+u_id+"' || player2_id='"+u_id+"';");
+        Statement stmt = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        String queryString = new String("select * from matches where player1_id='"+u_id+"' or player2_id='"+u_id+"';");
         ResultSet rs = stmt.executeQuery(queryString);
         if (!rs.next()) {
             return null;
