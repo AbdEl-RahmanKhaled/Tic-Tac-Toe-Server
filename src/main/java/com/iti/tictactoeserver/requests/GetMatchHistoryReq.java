@@ -8,6 +8,6 @@ public class GetMatchHistoryReq extends Request{
     }
 
     public GetMatchHistoryReq(@JsonProperty String action) {
-        super(action);
+        super(ACTION_GET_MATCH_HISTORY);
     }
 }
