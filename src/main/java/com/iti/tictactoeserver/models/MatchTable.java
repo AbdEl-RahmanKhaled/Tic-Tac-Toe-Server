@@ -6,11 +6,11 @@ import java.sql.Timestamp;
 
 public class MatchTable {
     private String player1_Name, player2_Name, winner,status;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private Timestamp m_date;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private String m_date;
 
     public MatchTable(){}
-    public MatchTable(String player1_Name, String player2_Name, String winner, String status, Timestamp m_date) {
+    public MatchTable(String player1_Name, String player2_Name, String winner, String status, String m_date) {
         this.player1_Name = player1_Name;
         this.player2_Name = player2_Name;
         this.winner = winner;
@@ -42,11 +42,11 @@ public class MatchTable {
         this.status = status;
     }
 
-    public Timestamp getM_date() {
+    public String getM_date() {
         return m_date;
     }
 
-    public void setM_date(Timestamp m_date) {
+    public void setM_date(String m_date) {
         this.m_date = m_date;
     }
 

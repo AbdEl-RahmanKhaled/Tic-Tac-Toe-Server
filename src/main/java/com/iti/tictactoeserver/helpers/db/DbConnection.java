@@ -215,7 +215,7 @@ public class DbConnection {
         }
         do {
             MatchTable match = new MatchTable();
-            match.setM_date(rs.getTimestamp(1));
+            match.setM_date(rs.getTimestamp(1).toLocalDateTime().toString().split("T")[0]);
             match.setPlayer1_Name(rs.getString(2));
             match.setPlayer2_Name(rs.getString(3));
             match.setWinner(rs.getString(4));
