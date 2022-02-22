@@ -456,8 +456,8 @@ public class ClientHandler extends Thread {
             clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
             clients.get(this.getId()).myFullInfoPlayer.setInGame(false);
             clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
-            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         }
+        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         clients.remove(this.getId());
     }
 
