@@ -55,6 +55,7 @@ public class LoginRes extends Response{
 
     public void setPlayerFullInfo(PlayerFullInfo playerFullInfo) {
         this.playerFullInfo = playerFullInfo;
+        this.playerFullInfoMap=playerFullInfoMap;
     }
 
     public Map<Integer, PlayerFullInfo> getPlayerFullInfoMap() {

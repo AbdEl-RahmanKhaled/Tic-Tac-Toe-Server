@@ -3,6 +3,7 @@ package com.iti.tictactoeserver.helpers.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.Match;
+import com.iti.tictactoeserver.models.MatchTable;
 import com.iti.tictactoeserver.models.Player;
 import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.notification.*;
@@ -92,7 +93,7 @@ public class ClientHandler extends Thread {
             //create response
             GetMatchHistoryRes getMatchHistoryRes = new GetMatchHistoryRes();
             //get matches from database
-            List<Match> userMatches = dbConnection.getMatchHistory(u_id);
+            List<MatchTable> userMatches = dbConnection.getMatchHistory(u_id);
             //if there are matches, send them back to the client
             if (userMatches.size() != 0) {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
