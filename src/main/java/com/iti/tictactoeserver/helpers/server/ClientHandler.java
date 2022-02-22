@@ -397,8 +397,8 @@ public class ClientHandler extends Thread {
             // check if the competitor is still online and not in a game
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create error response
-                InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, clients.get(this.getId()).myFullInfoPlayer);
-                inviteToGameRes.setMessage("It seems your competitor can not play with you at this moment.");
+                InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, new Player(clients.get(this.getId()).myFullInfoPlayer));
+                inviteToGameRes.setMessage("It seems your competitor "+ clients.get(this.getId()).myFullInfoPlayer.getName() + " can not play with you at this moment.");
                 // create json from response
                 String jResponse = mapper.writeValueAsString(inviteToGameRes);
                 // send the response to the client
@@ -444,6 +444,7 @@ public class ClientHandler extends Thread {
                 // notify the competitor
                 CompetitorConnectionIssueNotification competitorConnectionIssueNotification = new CompetitorConnectionIssueNotification();
                 String jNotification = mapper.writeValueAsString(competitorConnectionIssueNotification);
+
                 clients.get(this.getId()).competitor.printStream.println(jNotification);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
@@ -452,6 +453,7 @@ public class ClientHandler extends Thread {
         // if not logged in
         if (clients.get(this.getId()).myFullInfoPlayer != null) {
             clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
+            clients.get(this.getId()).myFullInfoPlayer.setInGame(false);
             clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
             updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         }

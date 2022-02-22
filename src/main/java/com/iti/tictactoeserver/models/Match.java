@@ -15,6 +15,7 @@ public class Match {
     public static final String STATUS_PAUSED = "paused";
 
     public Match() {
+        this.m_id = this.winner = -1;
     }
 
     public Match(int player1_id, int player2_id, int winner, String p1_choice, String p2_choice, String status, Timestamp m_date) {
@@ -34,6 +35,7 @@ public class Match {
         this.p2_choice = p2_choice;
         this.status = status;
         this.m_date = m_date;
+        this.m_id = this.winner = -1;
     }
 
     public int getM_id() {
