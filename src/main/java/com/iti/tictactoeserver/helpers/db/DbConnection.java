@@ -203,11 +203,10 @@ public class DbConnection {
     }
 
     public List<MatchTable> getMatchHistory(int u_id) throws SQLException {
-        List<MatchTable> matches = new ArrayList<>();
-        PreparedStatement pst = connection.prepareStatement("select m.m_date, u.name, uu.name, winner, m.status\n" +
+        List<MatchTable> matches=new ArrayList<>();
+        PreparedStatement pst = connection.prepareStatement("select m.m_date, u.name, uu.name, m.winner, m.status, m_id, m.player1_id, m.player2_id\n" +
                 "from matches m, users u, users uu\n" +
-                "where (m.player1_id=u.u_id and m.player2_id=u.u_id) or (m.player1_id=uu.u_id and m.player2_id=u.u_id)\n" +
-                "and (m.player1_id=? or m.player2_id=?);");
+                "where (m.player1_id=u.u_id and m.player2_id=u.u_id) or (m.player1_id=uu.u_id and m.player2_id=u.u_id) and (m.player1_id=? or m.player2_id=?);");
         pst.setInt(1, u_id);
         pst.setInt(2, u_id);
         ResultSet rs = pst.executeQuery();
@@ -215,16 +214,15 @@ public class DbConnection {
             return null;
         }
         do {
-            String wName = null;
-            if (ClientHandler.getPlayerFullInfo(rs.getInt("winner")) != null) {
-                wName = ClientHandler.getPlayerFullInfo(rs.getInt("winner")).getName();
-            }
             MatchTable match = new MatchTable();
             match.setM_date(rs.getTimestamp(1).toLocalDateTime().toString().split("T")[0]);
             match.setPlayer1_Name(rs.getString(2));
             match.setPlayer2_Name(rs.getString(3));
-            match.setWinner(wName);
+            match.setWinner(rs.getString(4));
             match.setStatus(rs.getString(5));
+            match.setM_id(rs.getInt(6));
+            match.setPlayer1_id(rs.getInt(7));
+            match.setPlayer2_id(rs.getInt(8));
             matches.add(match);
         } while (rs.next());
         return matches;
