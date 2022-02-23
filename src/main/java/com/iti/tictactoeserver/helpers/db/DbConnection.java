@@ -133,7 +133,7 @@ public class DbConnection {
             }
         }
     }
-
+/*
     public List<PlayerFullInfo> getAllPlayers() {
         List<PlayerFullInfo> players = new ArrayList<>();
         try {
@@ -154,7 +154,7 @@ public class DbConnection {
         }
         return players;
     }
-
+*/
 
     public Map<Integer, PlayerFullInfo> getAllPlayers(boolean b) {
         Map<Integer, PlayerFullInfo> players = new HashMap<>();

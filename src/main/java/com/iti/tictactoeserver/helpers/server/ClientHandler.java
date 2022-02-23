@@ -78,6 +78,7 @@ public class ClientHandler extends Thread {
                 String clientAction = (String) json.get("action");
                 actions.get(clientAction).handleAction(jRequest);
             } catch (Exception e) {
+                e.printStackTrace();
                 System.out.println("Stopped");
                 dropConnection();
                 System.out.println("No. of Clients: " + clients.size());

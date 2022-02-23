@@ -2,9 +2,9 @@ package com.iti.tictactoeserver.models;
 
 public class Message {
     private String message;
-    private String from;
+    private Player from;
 
-    public Message(String message, String from) {
+    public Message(String message, Player from) {
         this.message = message;
         this.from = from;
     }
@@ -24,11 +24,11 @@ public class Message {
         this.message = message;
     }
 
-    public String getFrom() {
+    public Player getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(Player from) {
         this.from = from;
     }
 }
