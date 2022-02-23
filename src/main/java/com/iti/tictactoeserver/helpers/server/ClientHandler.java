@@ -81,6 +81,7 @@ public class ClientHandler extends Thread {
                 System.out.println("Stopped");
                 dropConnection();
                 System.out.println("No. of Clients: " + clients.size());
+                e.printStackTrace();
                 break;
             }
         }
@@ -351,8 +352,9 @@ public class ClientHandler extends Thread {
                 // link the two player with each other
                 clients.get(this.getId()).competitor = _competitor;
                 clients.get(acceptInvitationReq.getPlayer().getS_id()).competitor = this;
+
                 // create new match
-                Match match = createMatch(acceptInvitationReq.getPlayer(), myFullInfoPlayer);
+                Match match = createMatch(acceptInvitationReq.getPlayer(), clients.get(this.getId()).myFullInfoPlayer);
                 // create start match notification
                 StartGameNotification startGameNotification = new StartGameNotification(match);
                 // create json
@@ -367,6 +369,7 @@ public class ClientHandler extends Thread {
                 updateStatus(clients.get(this.getId()).myFullInfoPlayer);
                 updateStatus(clients.get(_competitor.getId()).myFullInfoPlayer);
             } else {
+                System.out.println("offline");
                 // the competitor became offline or started a new another game
                 sendOfflineOrInGame(acceptInvitationReq.getPlayer(), _competitor);
             }
@@ -417,7 +420,7 @@ public class ClientHandler extends Thread {
         match.setPlayer2_id(p2.getDb_id());
         match.setM_date(new Timestamp(System.currentTimeMillis()));
         char[] choices = new char[]{Match.CHOICE_X, Match.CHOICE_O};
-        match.setP1_choice(String.valueOf(choices[new Random().nextInt(3)]));
+        match.setP1_choice(String.valueOf(choices[new Random().nextInt(2)]));
         match.setP2_choice(String.valueOf(choices[match.getP1_choice().equals(String.valueOf(Match.CHOICE_X)) ? 1 : 0]));
         return match;
     }
