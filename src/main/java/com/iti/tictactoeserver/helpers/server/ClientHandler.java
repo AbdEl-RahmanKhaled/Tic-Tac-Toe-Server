@@ -96,7 +96,7 @@ public class ClientHandler extends Thread {
             //get matches from database
             List<MatchTable> userMatches = dbConnection.getMatchHistory(u_id);
             //if there are matches, send them back to the client
-            if (userMatches.size() != 0) {
+            if (userMatches != null) {
                 getMatchHistoryRes.setStatus(GetMatchHistoryRes.STATUS_OK);
                 getMatchHistoryRes.setMatches(userMatches);
                 //convert the response to json String
@@ -123,6 +123,10 @@ public class ClientHandler extends Thread {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void acceptToPause(String json) {
 
     }
 
@@ -199,7 +203,7 @@ public class ClientHandler extends Thread {
             BackFromOfflineReq backFromOfflineReq = mapper.readValue(json, BackFromOfflineReq.class);
             playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id()).setS_id(this.getId());
             playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id()).setStatus(Player.ONLINE);
-            clients.get(this.getId()).myFullInfoPlayer =  playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id());
+            clients.get(this.getId()).myFullInfoPlayer = playersFullInfo.get(backFromOfflineReq.getPlayer().getDb_id());
             updateStatus(clients.get(this.getId()).myFullInfoPlayer);
             LoginRes loginRes = new LoginRes(
                     LoginRes.STATUS_OK,
@@ -241,15 +245,26 @@ public class ClientHandler extends Thread {
         try {
             SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
             dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
-            FinishGameNotification finishGameNotification = new FinishGameNotification();
-            String jResponse = mapper.writeValueAsString(finishGameNotification);
-            clients.get(this.getId()).competitor.printStream.println(jResponse);
-            clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
-            clients.get(this.getId()).competitor = null;
+
+            // if the game was with a player
+            if (clients.get(this.getId()).competitor != null) {
+                FinishGameNotification finishGameNotification = new FinishGameNotification();
+                String jResponse = mapper.writeValueAsString(finishGameNotification);
+                // notify the competitor the game is finished
+                clients.get(this.getId()).competitor.printStream.println(jResponse);
+
+                clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer.setInGame(false);
+                updateStatus(clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer);
+
+                clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
+                clients.get(this.getId()).competitor = null;
+            }
+
+            clients.get(this.getId()).myFullInfoPlayer.setInGame(false);
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-
     }
 
     private void rejectToPause(String json) {
@@ -402,7 +417,7 @@ public class ClientHandler extends Thread {
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create error response
                 InviteToGameRes inviteToGameRes = new InviteToGameRes(InviteToGameRes.STATUS_ERROR, new Player(clients.get(this.getId()).myFullInfoPlayer));
-                inviteToGameRes.setMessage("It seems your competitor "+ clients.get(this.getId()).myFullInfoPlayer.getName() + " can not play with you at this moment.");
+                inviteToGameRes.setMessage("It seems your competitor " + clients.get(this.getId()).myFullInfoPlayer.getName() + " can not play with you at this moment.");
                 // create json from response
                 String jResponse = mapper.writeValueAsString(inviteToGameRes);
                 // send the response to the client
@@ -476,7 +491,6 @@ public class ClientHandler extends Thread {
 
     private void updateStatus(PlayerFullInfo playerFullInfo) {
         // update player status in the list
-//        playersFullInfo.set(playerFullInfo.getIndex(), playerFullInfo);
         playersFullInfo.put(playerFullInfo.getDb_id(), playerFullInfo);
         // create notification to send
         UpdateStatusNotification updateStatusNotification = new UpdateStatusNotification(playerFullInfo);
@@ -500,6 +514,10 @@ public class ClientHandler extends Thread {
         for (ClientHandler client : clients.values()) {
             client.interrupt();
         }
+    }
+
+    public static PlayerFullInfo getPlayerFullInfo(int db_id) {
+        return playersFullInfo.get(db_id);
     }
 
     @Override
