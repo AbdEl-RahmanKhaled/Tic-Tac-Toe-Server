@@ -543,21 +543,6 @@ public class ClientHandler extends Thread {
         }
     }
 
-    //    private PlayerFullInfo getPlayer(long s_id) {
-//        return playersFullInfo.stream().filter(playerFullInfo -> playerFullInfo.getS_id() == s_id)
-//                .collect(Collectors.toList()).get(0);
-//    }
-
-
-//    private ClientHandler getCompetitor(Player player) {
-//        List<ClientHandler> competitor = clients.stream()
-//                .filter(clientHandler -> clientHandler.getId() == player.getS_id()).collect(Collectors.toList());
-//        if (competitor.isEmpty())
-//            return null;
-//        else
-//            return competitor.get(0);
-//    }
-
     interface IAction {
         void handleAction(String json);
     }
