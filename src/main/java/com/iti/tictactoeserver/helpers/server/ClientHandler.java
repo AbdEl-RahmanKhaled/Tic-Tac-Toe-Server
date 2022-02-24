@@ -125,9 +125,6 @@ public class ClientHandler extends Thread {
 
     }
 
-    private void acceptToPause(String json) {
-
-    }
 
     public void login(String json) {
         try {
@@ -253,20 +250,25 @@ public class ClientHandler extends Thread {
                     PauseGameNotification pauseGameNotification = new PauseGameNotification();
                     jResponse = mapper.writeValueAsString(pauseGameNotification);
                 } else {
+                    // if status of the match is finished
                     FinishGameNotification finishGameNotification = new FinishGameNotification();
                     finishGameNotification.setWinner(saveMatchReq.getMatch().getWinner());
                     jResponse = mapper.writeValueAsString(finishGameNotification);
                 }
-                // notify the competitor the game status
-                clients.get(this.getId()).competitor.printStream.println(jResponse);
-
-                clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer.setInGame(false);
-                updateStatus(clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer);
-
-                clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
+                // if the competitor still connected
+                if (clients.get(clients.get(this.getId()).competitor.getId()) != null){
+                    // notify the competitor the game status
+                    clients.get(this.getId()).competitor.printStream.println(jResponse);
+                    // update competitor in game status
+                    clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer.setInGame(false);
+                    updateStatus(clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer);
+                    // unlink from the competitor
+                    clients.get(clients.get(this.getId()).competitor.getId()).competitor = null;
+                }
+                // unlink from the competitor
                 clients.get(this.getId()).competitor = null;
             }
-
+            // update in game status for the player
             clients.get(this.getId()).myFullInfoPlayer.setInGame(false);
             updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         } catch (JsonProcessingException e) {
@@ -491,6 +493,10 @@ public class ClientHandler extends Thread {
             UpdateInGameStatusReq updateInGameStatusReq = mapper.readValue(json, UpdateInGameStatusReq.class);
             clients.get(this.getId()).myFullInfoPlayer.setInGame(updateInGameStatusReq.getInGame());
             updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+            // if were in game then competitor disconnected
+            if (!updateInGameStatusReq.getInGame() && clients.get(this.getId()).competitor != null) {
+                clients.get(this.getId()).competitor = null;
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
