@@ -59,7 +59,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_ASK_TO_PAUSE, this::askToPause);
         actions.put(Request.ACTION_SAVE_MATCH, this::saveMatch);
         actions.put(Request.ACTION_REJECT_TO_PAUSE, this::rejectToPause);
-        actions.put(Request.ACTION_SEND_MESSAGE, this::sendMsg);
+        actions.put(Request.ACTION_SEND_MESSAGE, this::sendMessage);
         actions.put(Request.ACTION_GET_MATCH_HISTORY, this::getMatchHistory);
         actions.put(Request.ACTION_ASK_TO_RESUME, this::askToResume);
         actions.put(Request.ACTION_REJECT_TO_RESUME, this::rejectToResume);
@@ -180,14 +180,16 @@ public class ClientHandler extends Thread {
     }
 
 
-    private void sendMsg(String json){
-
+    private void sendMessage(String json) {
         try {
+            // get the object from the json
             SendMessageReq sendMessageReq = mapper.readValue(json, SendMessageReq.class);
-            SendMessageRes sendMessageRes = new SendMessageRes(Response.RESPONSE_SEND_MESSAGE,sendMessageReq.getMsg());
-            System.out.println(sendMessageRes.getMsg().getMessage());
-            String jResponse = mapper.writeValueAsString(sendMessageRes);
-            clients.get(this.getId()).competitor.printStream.println(jResponse);
+            // create notification for message
+            MessageNotification messageNotification = new MessageNotification(sendMessageReq.getMessage());
+            // convert notification to json
+            String jNotification = mapper.writeValueAsString(messageNotification);
+            // get the competitor socket then send him the message
+            clients.get(this.getId()).competitor.printStream.println(jNotification);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
