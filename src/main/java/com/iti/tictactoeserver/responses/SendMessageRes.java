@@ -13,4 +13,11 @@ public class SendMessageRes extends Response {
         this.type = type;
         this.message = message;
     }
+    public Message getMsg() {
+        return message;
+    }
+
+    public void setMsg(Message message) {
+        this.message = message;
+    }
 }

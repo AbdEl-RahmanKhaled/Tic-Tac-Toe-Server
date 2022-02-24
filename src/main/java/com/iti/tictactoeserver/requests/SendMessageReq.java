@@ -20,11 +20,11 @@ public class SendMessageReq extends Request {
         this.message = message;
     }
 
-    public Message getMessage() {
+    public Message getMsg() {
         return message;
     }
 
-    public void setMessage(Message message) {
+    public void setMsg(Message message) {
         this.message = message;
     }
 }
