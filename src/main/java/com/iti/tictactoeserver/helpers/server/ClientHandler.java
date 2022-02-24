@@ -417,7 +417,7 @@ public class ClientHandler extends Thread {
         match.setPlayer2_id(p2.getDb_id());
         match.setM_date(new Timestamp(System.currentTimeMillis()));
         char[] choices = new char[]{Match.CHOICE_X, Match.CHOICE_O};
-        match.setP1_choice(String.valueOf(choices[new Random().nextInt(3)]));
+        match.setP1_choice(String.valueOf(choices[new Random().nextInt(2)]));
         match.setP2_choice(String.valueOf(choices[match.getP1_choice().equals(String.valueOf(Match.CHOICE_X)) ? 1 : 0]));
         return match;
     }
