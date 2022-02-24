@@ -9,7 +9,6 @@ import com.iti.tictactoeserver.models.PlayerFullInfo;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
-import javafx.scene.paint.Stop;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -248,9 +247,17 @@ public class ClientHandler extends Thread {
 
             // if the game was with a player
             if (clients.get(this.getId()).competitor != null) {
-                FinishGameNotification finishGameNotification = new FinishGameNotification();
-                String jResponse = mapper.writeValueAsString(finishGameNotification);
-                // notify the competitor the game is finished
+                String jResponse;
+                // if status of the match is paused
+                if (saveMatchReq.getMatch().getStatus().equals(Match.STATUS_PAUSED)) {
+                    PauseGameNotification pauseGameNotification = new PauseGameNotification();
+                    jResponse = mapper.writeValueAsString(pauseGameNotification);
+                } else {
+                    FinishGameNotification finishGameNotification = new FinishGameNotification();
+                    finishGameNotification.setWinner(saveMatchReq.getMatch().getWinner());
+                    jResponse = mapper.writeValueAsString(finishGameNotification);
+                }
+                // notify the competitor the game status
                 clients.get(this.getId()).competitor.printStream.println(jResponse);
 
                 clients.get(clients.get(this.getId()).competitor.getId()).myFullInfoPlayer.setInGame(false);

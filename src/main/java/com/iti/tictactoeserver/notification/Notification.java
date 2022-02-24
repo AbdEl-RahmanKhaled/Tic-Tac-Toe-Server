@@ -15,6 +15,7 @@ public class Notification {
     public static final String NOTIFICATION_FINISH_GAME = "finishGameNotification";
     public static final String NOTIFICATION_ASK_TO_RESUME = "askToResumeNotification";
     public static final String NOTIFICATION_RESUME_GAME = "resumeGameNotification";
+    public static final String NOTIFICATION_PAUSE_GAME = "pauseGameNotification";
 
 
 
