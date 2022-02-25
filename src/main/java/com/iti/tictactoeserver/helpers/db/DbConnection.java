@@ -69,7 +69,6 @@ public class DbConnection {
                 match.setP2_choice(resultSet.getString(6));
                 match.setStatus(resultSet.getString(7));
                 match.setStatus(resultSet.getString(8));
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
