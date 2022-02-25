@@ -342,8 +342,9 @@ public class ClientHandler extends Thread {
                 // link the two player with each other
                 clients.get(this.getId()).competitor = _competitor;
                 clients.get(acceptToResumeReq.getPlayer().getS_id()).competitor = this;
+                Match match = dbConnection.getMatch(acceptToResumeReq.getMatch().getM_id());
                 // create resume match notification
-                ResumeGameNotification resumeGameNotification = new ResumeGameNotification(acceptToResumeReq.getMatch(),
+                ResumeGameNotification resumeGameNotification = new ResumeGameNotification(match ,
                         dbConnection.getPositions(acceptToResumeReq.getMatch()));
                 // create json
                 String jNotification = mapper.writeValueAsString(resumeGameNotification);

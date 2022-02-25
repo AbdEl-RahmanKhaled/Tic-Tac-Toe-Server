@@ -53,6 +53,30 @@ public class DbConnection {
         }
     }
 
+    public Match getMatch(int m_id){
+        PreparedStatement stm = null;
+        Match match = new Match();
+        try {
+            stm = connection.prepareStatement("select * from matches where m_id = ?");
+            stm.setInt(1, m_id);
+            ResultSet resultSet = stm.executeQuery();
+            if(resultSet.next()){
+                match.setM_id(resultSet.getInt(1));
+                match.setM_date(resultSet.getTimestamp(2));
+                match.setPlayer1_id(resultSet.getInt(3));
+                match.setPlayer2_id(resultSet.getInt(4));
+                match.setP1_choice(resultSet.getString(5));
+                match.setP2_choice(resultSet.getString(6));
+                match.setStatus(resultSet.getString(7));
+                match.setStatus(resultSet.getString(8));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return match;
+    }
+
     public boolean ValidateUserName(String user_name) {
         PreparedStatement p = null;
         try {
@@ -188,13 +212,14 @@ public class DbConnection {
     public List<Position> getPositions(Match match) {
         List<Position> positions = new ArrayList<>();
         try {
-            PreparedStatement pst = connection.prepareStatement("select position from positions where m_id = ?");
+            PreparedStatement pst = connection.prepareStatement("select * from positions where m_id = ?");
             pst.setInt(1, match.getM_id());
             ResultSet rsmatch = pst.executeQuery();
             while (rsmatch.next()) {
                 positions.add(new Position(rsmatch.getInt("m_id"),
                         rsmatch.getInt("player_id"),
                         rsmatch.getString("position")));
+                System.out.println(rsmatch.getString("position"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -214,11 +239,15 @@ public class DbConnection {
             return null;
         }
         do {
+            String wName = null;
+            if (ClientHandler.getPlayerFullInfo(rs.getInt("winner")) != null) {
+                wName = ClientHandler.getPlayerFullInfo(rs.getInt("winner")).getName();
+            }
             MatchTable match = new MatchTable();
             match.setM_date(rs.getTimestamp(1).toLocalDateTime().toString().split("T")[0]);
             match.setPlayer1_Name(rs.getString(2));
             match.setPlayer2_Name(rs.getString(3));
-            match.setWinner(rs.getString(4));
+            match.setWinner(wName);
             match.setStatus(rs.getString(5));
             match.setM_id(rs.getInt(6));
             match.setPlayer1_id(rs.getInt(7));

@@ -10,7 +10,7 @@ public class MatchTable {
     private String m_date;
     private int m_id,player1_id, player2_id;
     public static final String STATUS_FINISHED = "finished";
-    public static final String STATUS_PAUSED = "Paused";
+    public static final String STATUS_PAUSED = "paused";
 
     public MatchTable(){}
     public MatchTable(String player1_Name, String player2_Name, String winner, String status, String m_date, int m_id, int player1_id, int player2_id) {
