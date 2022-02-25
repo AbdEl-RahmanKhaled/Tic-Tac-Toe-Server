@@ -53,14 +53,14 @@ public class DbConnection {
         }
     }
 
-    public Match getMatch(int m_id){
+    public Match getMatch(int m_id) {
         PreparedStatement stm = null;
         Match match = new Match();
         try {
             stm = connection.prepareStatement("select * from matches where m_id = ?");
             stm.setInt(1, m_id);
             ResultSet resultSet = stm.executeQuery();
-            if(resultSet.next()){
+            if (resultSet.next()) {
                 match.setM_id(resultSet.getInt(1));
                 match.setM_date(resultSet.getTimestamp(2));
                 match.setPlayer1_id(resultSet.getInt(3));
@@ -112,16 +112,15 @@ public class DbConnection {
             stm.setString(6, match.getStatus());
             stm.setInt(7, match.getWinner());
             stm.setString(8, match.getLevel());
-            boolean done = stm.execute();
+            stm.execute();
 
-            if (done) {
-                // get match id if match inserted successfully
-                int m_id = selectMatchId(match.getM_date(), match.getPlayer1_id(), match.getPlayer2_id());
-                if (m_id != -1) {
-                    // insert positions
-                    insertPositions(positions, m_id);
-                }
+            // get match id if match inserted successfully
+            int m_id = selectMatchId(match.getM_date(), match.getPlayer1_id(), match.getPlayer2_id());
+            if (m_id != -1) {
+                // insert positions
+                insertPositions(positions, m_id);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -135,8 +134,10 @@ public class DbConnection {
             stm.setTimestamp(1, m_date);
             stm.setInt(2, p1_id);
             stm.setInt(3, p2_id);
-
-            m_id = stm.executeQuery().getInt("m_id");
+            ResultSet resultSet = stm.executeQuery();
+            if (resultSet.next()) {
+                m_id = resultSet.getInt("m_id");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -227,7 +228,7 @@ public class DbConnection {
     }
 
     public List<MatchTable> getMatchHistory(int u_id) throws SQLException {
-        List<MatchTable> matches=new ArrayList<>();
+        List<MatchTable> matches = new ArrayList<>();
         PreparedStatement pst = connection.prepareStatement("select m.m_date, u.name, uu.name, m.winner, m.status, m_id, m.player1_id, m.player2_id\n" +
                 "from matches m, users u, users uu\n" +
                 "where (m.player1_id=u.u_id and m.player2_id=u.u_id) or (m.player1_id=uu.u_id and m.player2_id=u.u_id) and (m.player1_id=? or m.player2_id=?);");
