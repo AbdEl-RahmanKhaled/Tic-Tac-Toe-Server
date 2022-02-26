@@ -76,6 +76,20 @@ public class DbConnection {
         return match;
     }
 
+    public boolean updatePoints(int db_id){
+        PreparedStatement p = null;
+        try {
+            p = connection.prepareStatement("update users set points= (points + 1) where u_id = ?");
+            p.setInt(1, db_id);
+            int rs = p.executeUpdate();
+            if(rs==1)
+                return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean ValidateUserName(String user_name) {
         PreparedStatement p = null;
         try {

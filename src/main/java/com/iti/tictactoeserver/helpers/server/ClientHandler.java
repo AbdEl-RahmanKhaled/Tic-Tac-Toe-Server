@@ -146,6 +146,7 @@ public class ClientHandler extends Thread {
             String jResponse = mapper.writeValueAsString(loginRes);
             System.out.println(jResponse);
             printStream.println(jResponse);
+
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -250,9 +251,17 @@ public class ClientHandler extends Thread {
                     PauseGameNotification pauseGameNotification = new PauseGameNotification();
                     jResponse = mapper.writeValueAsString(pauseGameNotification);
                 } else {
+                    int u_id = saveMatchReq.getMatch().getWinner();
+                    //update points
+                    if(dbConnection.updatePoints(u_id)){
+                        int points = playersFullInfo.get(u_id).getPoints();
+                        playersFullInfo.get(u_id).setPoints(points+1);
+                        updateStatus(playersFullInfo.get(u_id));
+                    }
+
                     // if status of the match is finished
                     FinishGameNotification finishGameNotification = new FinishGameNotification();
-                    finishGameNotification.setWinner(saveMatchReq.getMatch().getWinner());
+                    finishGameNotification.setWinner(u_id);
                     jResponse = mapper.writeValueAsString(finishGameNotification);
                 }
                 // if the competitor still connected
@@ -320,7 +329,7 @@ public class ClientHandler extends Thread {
             // check if the competitor is still online and not in a game
             if (_competitor != null && !_competitor.myFullInfoPlayer.isInGame()) {
                 // create error response
-                AskToResumeRes askToResumeRes = new AskToResumeRes(AskToResumeRes.STATUS_ERROR, clients.get(this.getId()).myFullInfoPlayer);
+                AskToResumeRes askToResumeRes = new AskToResumeRes(AskToResumeRes.STATUS_ERROR, new Player(clients.get(this.getId()).myFullInfoPlayer));
                 askToResumeRes.setMessage("It seems your competitor can not resume the game at this moment.");
                 // create json from response
                 String jResponse = mapper.writeValueAsString(askToResumeRes);
