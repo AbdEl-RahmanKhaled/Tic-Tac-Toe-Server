@@ -11,6 +11,7 @@ public class Response {
     public static final String RESPONSE_ASK_TO_PAUSE = "askToPauseRes";
     public static final String RESPONSE_ASK_TO_RESUME = "askToResumeRes";
     public static final String RESPONSE_GET_MATCH_HISTORY = "getMatchHistoryRes";
+    public static final String RESPONSE_GET_PAUSED_MATCH = "getPausedMatch";
 
     protected String message, status, type;
 

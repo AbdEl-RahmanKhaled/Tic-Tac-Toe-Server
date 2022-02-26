@@ -2,10 +2,7 @@ package com.iti.tictactoeserver.helpers.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
-import com.iti.tictactoeserver.models.Match;
-import com.iti.tictactoeserver.models.MatchTable;
-import com.iti.tictactoeserver.models.Player;
-import com.iti.tictactoeserver.models.PlayerFullInfo;
+import com.iti.tictactoeserver.models.*;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
@@ -64,6 +61,7 @@ public class ClientHandler extends Thread {
         actions.put(Request.ACTION_REJECT_TO_RESUME, this::rejectToResume);
         actions.put(Request.ACTION_ACCEPT_TO_RESUME, this::acceptToResume);
         actions.put(Request.ACTION_BACK_FROM_OFFLINE, this::backFromOffline);
+        actions.put(Request.ACTION_GET_PAUSED_MATCH, this::getPausedMatch);
     }
 
 
@@ -83,6 +81,23 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
                 break;
             }
+        }
+    }
+
+    public void getPausedMatch(String json){
+        try {
+            GetPausedMatchReq getPausedMatchReq = mapper.readValue(json, GetPausedMatchReq.class);
+            Match match = dbConnection.getMatch(getPausedMatchReq.getM_id());
+            List<Position> positions = dbConnection.getPositions(match);
+            if(positions!=null){
+                GetPausedMatchRes getPausedMatchRes = new GetPausedMatchRes(positions, match);
+                String jResponse = mapper.writeValueAsString(getPausedMatchRes);
+                printStream.println(jResponse);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } {
+
         }
     }
 

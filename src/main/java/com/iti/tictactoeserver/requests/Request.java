@@ -22,6 +22,8 @@ public class Request {
     public static final String ACTION_ACCEPT_TO_RESUME = "acceptToResume";
     public static final String ACTION_GET_MATCH_HISTORY = "getMatchHistory";
     public static final String ACTION_BACK_FROM_OFFLINE = "backFromOffline";
+    public static final String ACTION_GET_PAUSED_MATCH = "getPausedMatch";
+
 
 
     public Request() {
