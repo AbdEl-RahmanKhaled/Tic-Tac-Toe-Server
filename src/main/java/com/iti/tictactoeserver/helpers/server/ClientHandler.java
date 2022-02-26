@@ -1,11 +1,13 @@
 package com.iti.tictactoeserver.helpers.server;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.iti.tictactoeserver.TicTacToeServer;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
 import com.iti.tictactoeserver.models.*;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
 import com.iti.tictactoeserver.responses.*;
+import javafx.application.Platform;
 import org.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -172,6 +174,7 @@ public class ClientHandler extends Thread {
         playersFullInfo = new HashMap<>();
         playersFullInfo = dbConnection.getAllPlayers(true);
         System.out.println(playersFullInfo.size());
+        Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
     }
 
     private void signUp(String json) {
@@ -268,19 +271,18 @@ public class ClientHandler extends Thread {
                 } else {
                     int u_id = saveMatchReq.getMatch().getWinner();
                     //update points
-                    if(dbConnection.updatePoints(u_id)){
+                    if (dbConnection.updatePoints(u_id)) {
                         int points = playersFullInfo.get(u_id).getPoints();
-                        playersFullInfo.get(u_id).setPoints(points+1);
+                        playersFullInfo.get(u_id).setPoints(points + 1);
                         updateStatus(playersFullInfo.get(u_id));
                     }
-
                     // if status of the match is finished
                     FinishGameNotification finishGameNotification = new FinishGameNotification();
                     finishGameNotification.setWinner(u_id);
                     jResponse = mapper.writeValueAsString(finishGameNotification);
                 }
                 // if the competitor still connected
-                if (clients.get(clients.get(this.getId()).competitor.getId()) != null){
+                if (clients.get(clients.get(this.getId()).competitor.getId()) != null) {
                     // notify the competitor the game status
                     clients.get(this.getId()).competitor.printStream.println(jResponse);
                     // update competitor in game status
@@ -368,7 +370,7 @@ public class ClientHandler extends Thread {
                 clients.get(acceptToResumeReq.getPlayer().getS_id()).competitor = this;
                 Match match = dbConnection.getMatch(acceptToResumeReq.getMatch().getM_id());
                 // create resume match notification
-                ResumeGameNotification resumeGameNotification = new ResumeGameNotification(match ,
+                ResumeGameNotification resumeGameNotification = new ResumeGameNotification(match,
                         dbConnection.getPositions(acceptToResumeReq.getMatch()));
                 // create json
                 String jNotification = mapper.writeValueAsString(resumeGameNotification);
@@ -538,11 +540,12 @@ public class ClientHandler extends Thread {
             // send to all client notification with now status for the player
             new Thread(() -> {
                 for (ClientHandler client : clients.values()) {
-                    if (client.getId() != playerFullInfo.getS_id() && client.myFullInfoPlayer != null) {
+                    if (client.myFullInfoPlayer != null) {
                         client.printStream.println(jNotification);
                     }
                 }
             }).start();
+            Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="437.0" prefWidth="527.0" spacing="10.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.iti.tictactoeserver.controllers.Controller">
+<VBox alignment="CENTER" minHeight="443.0" minWidth="533.0" prefHeight="443.0" prefWidth="533.0" spacing="10.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.iti.tictactoeserver.controllers.Controller">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
    <children>
-      <ListView maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets></ListView>
+      <TableView id="table" fx:id="tPlayers" prefHeight="384.0" prefWidth="299.0" style="-fx-background-radius: 10;">
+         <columns>
+            <TableColumn fx:id="cPlayerName" editable="false" prefWidth="152.0" resizable="false" style="-fx-alignment: BASELINE_CENTER;" styleClass=".col" text="Player" />
+            <TableColumn fx:id="cStatus" editable="false" prefWidth="138.0" style="-fx-alignment: BASELINE_CENTER;" styleClass=".col" text="State" />
+            <TableColumn fx:id="cIsInGame" editable="false" prefWidth="98.0" style="-fx-alignment: BASELINE_CENTER;" styleClass=".col" text="Is in Game" />
+            <TableColumn fx:id="cScore" editable="false" prefWidth="98.0" style="-fx-alignment: BASELINE_CENTER;" styleClass=".col" text="Score" />
+         </columns>
+      </TableView>
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER" prefHeight="100.0">
          <children>
