@@ -146,6 +146,7 @@ public class ClientHandler extends Thread {
             String jResponse = mapper.writeValueAsString(loginRes);
             System.out.println(jResponse);
             printStream.println(jResponse);
+
         } catch (SQLException | JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -251,17 +252,17 @@ public class ClientHandler extends Thread {
                     jResponse = mapper.writeValueAsString(pauseGameNotification);
                 } else {
                     int u_id = saveMatchReq.getMatch().getWinner();
-                    // if status of the match is finished
-                    FinishGameNotification finishGameNotification = new FinishGameNotification();
-                    finishGameNotification.setWinner(u_id);
-                    jResponse = mapper.writeValueAsString(finishGameNotification);
-
                     //update points
                     if(dbConnection.updatePoints(u_id)){
                         int points = playersFullInfo.get(u_id).getPoints();
                         playersFullInfo.get(u_id).setPoints(points+1);
                         updateStatus(playersFullInfo.get(u_id));
                     }
+
+                    // if status of the match is finished
+                    FinishGameNotification finishGameNotification = new FinishGameNotification();
+                    finishGameNotification.setWinner(u_id);
+                    jResponse = mapper.writeValueAsString(finishGameNotification);
                 }
                 // if the competitor still connected
                 if (clients.get(clients.get(this.getId()).competitor.getId()) != null){
