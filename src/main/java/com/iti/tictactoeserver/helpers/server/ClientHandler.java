@@ -253,14 +253,14 @@ public class ClientHandler extends Thread {
                     int u_id = saveMatchReq.getMatch().getWinner();
                     // if status of the match is finished
                     FinishGameNotification finishGameNotification = new FinishGameNotification();
-                    finishGameNotification.setWinner(saveMatchReq.getMatch().getWinner());
+                    finishGameNotification.setWinner(u_id);
                     jResponse = mapper.writeValueAsString(finishGameNotification);
 
                     //update points
-                    if(dbConnection.updatePoints(saveMatchReq.getMatch().getWinner())){
+                    if(dbConnection.updatePoints(u_id)){
                         int points = playersFullInfo.get(u_id).getPoints();
                         playersFullInfo.get(u_id).setPoints(points+1);
-                        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
+                        updateStatus(playersFullInfo.get(u_id));
                     }
                 }
                 // if the competitor still connected
