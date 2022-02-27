@@ -76,13 +76,13 @@ public class DbConnection {
         return match;
     }
 
-    public boolean updatePoints(int db_id){
+    public boolean updatePoints(int db_id) {
         PreparedStatement p = null;
         try {
             p = connection.prepareStatement("update users set points= (points + 1) where u_id = ?");
             p.setInt(1, db_id);
             int rs = p.executeUpdate();
-            if(rs==1)
+            if (rs == 1)
                 return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -140,7 +140,7 @@ public class DbConnection {
         }
     }
 
-    private int selectMatchId(Timestamp m_date, int p1_id, int p2_id) {
+    public int selectMatchId(Timestamp m_date, int p1_id, int p2_id) {
         int m_id = -1;
         try {
             PreparedStatement stm = connection.prepareStatement("select m_id from matches " +
@@ -171,6 +171,18 @@ public class DbConnection {
                 e.printStackTrace();
             }
         }
+    }
+    private void deletePositions(int m_id){
+        PreparedStatement p = null;
+        try {
+            p = connection.prepareStatement("delete from positions where m_id = ?");
+            p.setInt(1,m_id);
+            p.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public List<PlayerFullInfo> getAllPlayers() {
@@ -270,4 +282,51 @@ public class DbConnection {
         } while (rs.next());
         return matches;
     }
+
+    public MatchTable getMatchTable(int m_id) {
+        try {
+            PreparedStatement pst = connection.prepareStatement("select m.m_date, u.name, uu.name, m.winner, m.status, m_id, m.player1_id, m.player2_id\n" +
+                    "from matches m, users u, users uu\n" +
+                    "where (m.player1_id=u.u_id and m.player2_id=u.u_id) or (m.player1_id=uu.u_id and m.player2_id=u.u_id) and (m_id = ?);");
+            pst.setInt(1, m_id);
+            ResultSet rs = pst.executeQuery();
+            if (!rs.next()) {
+                return null;
+            }
+            String wName = null;
+            if (ClientHandler.getPlayerFullInfo(rs.getInt("winner")) != null) {
+                wName = ClientHandler.getPlayerFullInfo(rs.getInt("winner")).getName();
+            }
+            MatchTable match = new MatchTable();
+            match.setM_date(rs.getTimestamp(1).toLocalDateTime().toString().split("T")[0]);
+            match.setPlayer1_Name(rs.getString(2));
+            match.setPlayer2_Name(rs.getString(3));
+            match.setWinner(wName);
+            match.setStatus(rs.getString(5));
+            match.setM_id(rs.getInt(6));
+            match.setPlayer1_id(rs.getInt(7));
+            match.setPlayer2_id(rs.getInt(8));
+            return match;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void alterMatch(Match match, List<Position> positions){
+        PreparedStatement p = null;
+        try {
+            p = connection.prepareStatement("update matches set m_date=now(), status='finished', winner=? where m_id=?;");
+            p.setInt(1, match.getWinner());
+            p.setInt(2,match.getM_id());
+            p.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        deletePositions(match.getM_id());
+        insertPositions(positions, match.getM_id());
+
+    }
+
+
 }

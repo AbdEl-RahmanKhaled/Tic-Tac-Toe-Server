@@ -259,7 +259,16 @@ public class ClientHandler extends Thread {
     private void saveMatch(String json) {
         try {
             SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
-            dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
+            int m_id = dbConnection.selectMatchId(saveMatchReq.getMatch().getM_date(), saveMatchReq.getMatch().getPlayer1_id(), saveMatchReq.getMatch().getPlayer2_id());;
+            if(saveMatchReq.getMatch().getM_id() != -1){
+                System.out.println("alter");
+                saveMatchReq.getMatch().setM_id(m_id);
+                dbConnection.alterMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
+            }
+            else {
+                System.out.println("new");
+                dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
+            }
 
             // if the game was with a player
             if (clients.get(this.getId()).competitor != null) {
@@ -550,6 +559,8 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
     }
+
+
 
     public static void stopAll() {
         for (ClientHandler client : clients.values()) {
