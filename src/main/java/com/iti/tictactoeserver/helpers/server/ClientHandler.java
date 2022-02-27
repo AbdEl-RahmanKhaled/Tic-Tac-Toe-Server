@@ -80,25 +80,26 @@ public class ClientHandler extends Thread {
                 System.out.println("Stopped");
                 dropConnection();
                 System.out.println("No. of Clients: " + clients.size());
-                e.printStackTrace();
+//                e.printStackTrace();
                 break;
             }
         }
     }
 
-    public void getPausedMatch(String json){
+    public void getPausedMatch(String json) {
         try {
             GetPausedMatchReq getPausedMatchReq = mapper.readValue(json, GetPausedMatchReq.class);
             Match match = dbConnection.getMatch(getPausedMatchReq.getM_id());
             List<Position> positions = dbConnection.getPositions(match);
-            if(positions!=null){
+            if (positions != null) {
                 GetPausedMatchRes getPausedMatchRes = new GetPausedMatchRes(positions, match);
                 String jResponse = mapper.writeValueAsString(getPausedMatchRes);
                 printStream.println(jResponse);
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
-        } {
+        }
+        {
 
         }
     }
@@ -174,7 +175,11 @@ public class ClientHandler extends Thread {
         playersFullInfo = new HashMap<>();
         playersFullInfo = dbConnection.getAllPlayers(true);
         System.out.println(playersFullInfo.size());
-        Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
+
+        if (TicTacToeServer.controller != null) {
+            Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
+
+        }
     }
 
     private void signUp(String json) {
@@ -261,12 +266,11 @@ public class ClientHandler extends Thread {
             SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
             int m_id = saveMatchReq.getMatch().getM_id();
             System.out.println(saveMatchReq.getMatch().getM_id());
-            if(m_id != -1){
+            if (m_id != -1) {
                 System.out.println("alter");
                 saveMatchReq.getMatch().setM_id(m_id);
                 dbConnection.alterMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
-            }
-            else {
+            } else {
                 System.out.println("new");
                 dbConnection.saveMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
             }
@@ -520,8 +524,8 @@ public class ClientHandler extends Thread {
             clients.get(this.getId()).myFullInfoPlayer.setStatus(PlayerFullInfo.OFFLINE);
             clients.get(this.getId()).myFullInfoPlayer.setInGame(false);
             clients.get(this.getId()).myFullInfoPlayer.setS_id(-1);
+            updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         }
-        updateStatus(clients.get(this.getId()).myFullInfoPlayer);
         clients.remove(this.getId());
     }
 
@@ -555,12 +559,12 @@ public class ClientHandler extends Thread {
                     }
                 }
             }).start();
-            Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
+            if (TicTacToeServer.controller != null)
+                Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
-
 
 
     public static void stopAll() {
