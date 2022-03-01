@@ -3,7 +3,7 @@ pipeline {
     agent { label 'aws-tic-tac-toe' }
 
     environment {
-        OLD_TAG="1.0"
+        OLD_TAG="latest"
         NEW_TAG="latest"
         APP_NAME = "ticTac"
         IMG = "abdelrahmankha/tic-tac-toe-server"

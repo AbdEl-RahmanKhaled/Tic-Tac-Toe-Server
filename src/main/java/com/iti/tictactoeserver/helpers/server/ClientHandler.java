@@ -265,10 +265,8 @@ public class ClientHandler extends Thread {
         try {
             SaveMatchReq saveMatchReq = mapper.readValue(json, SaveMatchReq.class);
             int m_id = saveMatchReq.getMatch().getM_id();
-            System.out.println(saveMatchReq.getMatch().getM_id());
-            if (m_id != -1 && !saveMatchReq.getMatch().getStatus().equals(Match.STATUS_PAUSED)) {
+            if (m_id != -1) {
                 System.out.println("alter");
-                saveMatchReq.getMatch().setM_id(m_id);
                 dbConnection.alterMatch(saveMatchReq.getMatch(), saveMatchReq.getPositions());
             } else {
                 System.out.println("new");
