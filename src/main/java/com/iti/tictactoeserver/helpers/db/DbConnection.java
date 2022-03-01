@@ -314,14 +314,16 @@ public class DbConnection {
     }
 
     public void alterMatch(Match match, List<Position> positions){
-        PreparedStatement p = null;
-        try {
-            p = connection.prepareStatement("update matches set m_date=now(), status='finished', winner=? where m_id=?;");
-            p.setInt(1, match.getWinner());
-            p.setInt(2,match.getM_id());
-            p.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if(!match.getStatus().equals(Match.STATUS_PAUSED)) {
+            PreparedStatement p = null;
+            try {
+                p = connection.prepareStatement("update matches set m_date=now(), status='finished', winner=? where m_id=?;");
+                p.setInt(1, match.getWinner());
+                p.setInt(2, match.getM_id());
+                p.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         deletePositions(match.getM_id());
         insertPositions(positions, match.getM_id());
