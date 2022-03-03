@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class ServerListener extends Thread {
     private static final int PORT = 5001;
-    private static final String HOST = "127.0.0.1";
+    private static final String HOST = "ec2-18-130-5-5.eu-west-2.compute.amazonaws.com";
     private static PrintStream printStream;
     private Socket socket;
     private BufferedReader bufferedReader;

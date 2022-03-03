@@ -70,15 +70,15 @@ public class DashboardController implements Initializable {
 
     public void fillPlayersTable(Map<Integer, PlayerFullInfo> _playersFullInfo) {
         playersFullInfo = _playersFullInfo;
-        updateTable();
         isStarted = true;
         lblStatus.setText("Running");
+        updateTable();
     }
 
     public void stopped() {
-        isStarted = false;
         playersFullInfo.clear();
         updateTable();
+        isStarted = false;
         lblStatus.setText("Stopped");
     }
 
@@ -88,15 +88,17 @@ public class DashboardController implements Initializable {
         updateTable();
     }
 
-    public void offline(boolean isOffline){
+    public void offline(boolean isOffline) {
         tPlayers.setDisable(isOffline);
         btnStart.setDisable(isOffline);
         btnStop.setDisable(isOffline);
     }
 
     private void updateTable() {
-        tPlayers.getItems().clear();
-        tPlayers.getItems().setAll(playersFullInfo.values());
-        tPlayers.getSortOrder().add(cStatus);
+        if (isStarted) {
+            tPlayers.getItems().clear();
+            tPlayers.getItems().setAll(playersFullInfo.values());
+            tPlayers.getSortOrder().add(cStatus);
+        }
     }
 }
