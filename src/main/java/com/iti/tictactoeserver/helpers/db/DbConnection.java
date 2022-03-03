@@ -11,10 +11,10 @@ import java.util.Map;
 
 public class DbConnection {
     private static final String dbName = "xo_db";
-    //    private static final String dbHost = System.getenv("HOST_NAME");
-//    private static final String dbPort = System.getenv("DB_PORT");
-    private static final String dbHost = "ec2-18-130-5-5.eu-west-2.compute.amazonaws.com";
-    private static final String dbPort = "5432";
+        private static final String dbHost = System.getenv("HOST_NAME");
+    private static final String dbPort = System.getenv("DB_PORT");
+//    private static final String dbHost = "ec2-18-130-5-5.eu-west-2.compute.amazonaws.com";
+//    private static final String dbPort = "5432";
     private static final String dbUser = "postgres";
     private static final String dbPass = "admin";
     private Connection connection;

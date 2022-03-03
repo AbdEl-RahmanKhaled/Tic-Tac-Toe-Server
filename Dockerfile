@@ -13,5 +13,5 @@ RUN mvn install
 FROM openjdk:17.0.2
 COPY --from=build /home/app/target/Tic-Tac-Toe-Server-1.0-jar-with-dependencies.jar /home/app/tick-tack-toe.jar
 WORKDIR /home/app
-EXPOSE 5000
+EXPOSE 5000 5001
 ENTRYPOINT ["java","-jar","tick-tack-toe.jar"]
