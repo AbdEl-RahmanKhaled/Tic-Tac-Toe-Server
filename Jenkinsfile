@@ -23,7 +23,7 @@ pipeline {
            steps {
                script {
                     echo 'deploying image....'
-                    sh "docker run -d --name ${APP_NAME} --network appnw -p5000:5000 -e HOST_NAME=db_server -e DB_PORT=5432 ${IMG}:${NEW_TAG}"
+                    sh "docker run -d --name ${APP_NAME} --network appnw -p5000:5000 -p5001:5001 -e HOST_NAME=db_server -e DB_PORT=5432 ${IMG}:${NEW_TAG}"
                     // def shellCmd = "bash ./run.sh ${OLD_TAG} ${NEW_TAG}"
                     // def instanceName = "ubuntu@18.134.241.110"
                     // sshagent(['ec2-app']) {
