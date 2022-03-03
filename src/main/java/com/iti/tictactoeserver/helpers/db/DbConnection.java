@@ -12,7 +12,7 @@ import java.util.Map;
 public class DbConnection {
     private static final String dbName = "xo_db";
     private static final String dbHost = "ec2-18-130-5-5.eu-west-2.compute.amazonaws.com";
-    private static final String dbPort = "80";
+    private static final String dbPort = "5432";
     private static final String dbUser = "postgres";
     private static final String dbPass = "admin";
     private Connection connection;
@@ -316,9 +316,10 @@ public class DbConnection {
     public void alterMatch(Match match, List<Position> positions){
         PreparedStatement p = null;
         try {
-            p = connection.prepareStatement("update matches set m_date=now(), status='finished', winner=? where m_id=?;");
-            p.setInt(1, match.getWinner());
-            p.setInt(2,match.getM_id());
+            p = connection.prepareStatement("update matches set m_date=now(), status=?, winner=? where m_id=?;");
+            p.setString(1, match.getStatus());
+            p.setInt(2, match.getWinner());
+            p.setInt(3,match.getM_id());
             p.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
