@@ -11,8 +11,10 @@ import java.util.Map;
 
 public class DbConnection {
     private static final String dbName = "xo_db";
-    private static final String dbHost = System.getenv("HOST_NAME");
-    private static final String dbPort = System.getenv("DB_PORT");
+    //    private static final String dbHost = System.getenv("HOST_NAME");
+//    private static final String dbPort = System.getenv("DB_PORT");
+    private static final String dbHost = "ec2-18-130-5-5.eu-west-2.compute.amazonaws.com";
+    private static final String dbPort = "5432";
     private static final String dbUser = "postgres";
     private static final String dbPass = "admin";
     private Connection connection;
@@ -172,11 +174,12 @@ public class DbConnection {
             }
         }
     }
-    private void deletePositions(int m_id){
+
+    private void deletePositions(int m_id) {
         PreparedStatement p = null;
         try {
             p = connection.prepareStatement("delete from positions where m_id = ?");
-            p.setInt(1,m_id);
+            p.setInt(1, m_id);
             p.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -313,13 +316,13 @@ public class DbConnection {
         return null;
     }
 
-    public void alterMatch(Match match, List<Position> positions){
+    public void alterMatch(Match match, List<Position> positions) {
         PreparedStatement p = null;
         try {
             p = connection.prepareStatement("update matches set m_date=now(), status=?, winner=? where m_id=?;");
             p.setString(1, match.getStatus());
             p.setInt(2, match.getWinner());
-            p.setInt(3,match.getM_id());
+            p.setInt(3, match.getM_id());
             p.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

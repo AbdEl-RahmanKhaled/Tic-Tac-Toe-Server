@@ -24,6 +24,10 @@ public class Request {
     public static final String ACTION_BACK_FROM_OFFLINE = "backFromOffline";
     public static final String ACTION_GET_PAUSED_MATCH = "getPausedMatch";
 
+    // Server Dashboard requests
+    public static final String ACTION_START_SERVER = "startServer";
+    public static final String ACTION_STOP_SERVER = "stopServer";
+
 
 
     public Request() {

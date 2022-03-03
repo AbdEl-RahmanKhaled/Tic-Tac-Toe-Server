@@ -17,6 +17,11 @@ public class Notification {
     public static final String NOTIFICATION_RESUME_GAME = "resumeGameNotification";
     public static final String NOTIFICATION_PAUSE_GAME = "pauseGameNotification";
 
+    // Dashboard notification
+    public static final String NOTIFICATION_SERVER_STARTED = "serverStartedNotification";
+    public static final String NOTIFICATION_SERVER_STOPPED = "serverStoppedNotification";
+
+
 
 
 

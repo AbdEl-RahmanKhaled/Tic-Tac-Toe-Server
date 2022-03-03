@@ -3,6 +3,7 @@ package com.iti.tictactoeserver.helpers.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.iti.tictactoeserver.TicTacToeServer;
 import com.iti.tictactoeserver.helpers.db.DbConnection;
+import com.iti.tictactoeserver.helpers.serverdashboard.DashBoardHandler;
 import com.iti.tictactoeserver.models.*;
 import com.iti.tictactoeserver.notification.*;
 import com.iti.tictactoeserver.requests.*;
@@ -20,7 +21,7 @@ import java.util.*;
 public class ClientHandler extends Thread {
 
     private static final DbConnection dbConnection = new DbConnection();
-    private static final ObjectMapper mapper = new ObjectMapper();
+    public static final ObjectMapper mapper = new ObjectMapper();
     private static Map<Long, ClientHandler> clients = new HashMap<>();
     private static Map<Integer, PlayerFullInfo> playersFullInfo;
     private Map<String, IAction> actions;
@@ -177,9 +178,16 @@ public class ClientHandler extends Thread {
         System.out.println(playersFullInfo.size());
 
         if (TicTacToeServer.controller != null) {
+            // if gui mode
             Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
-
+        } else {
+            // if terminal mode
+            DashBoardHandler.sendData();
         }
+    }
+
+    public static Map<Integer, PlayerFullInfo> getPlayersFullInfo() {
+        return playersFullInfo;
     }
 
     private void signUp(String json) {
@@ -557,8 +565,11 @@ public class ClientHandler extends Thread {
                     }
                 }
             }).start();
-            if (TicTacToeServer.controller != null)
+            if (TicTacToeServer.controller != null) {
                 Platform.runLater(() -> TicTacToeServer.controller.fillPlayersTable(playersFullInfo.values()));
+            } else {
+                DashBoardHandler.sendUpdate(jNotification);
+            }
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
